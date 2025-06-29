@@ -1,6 +1,0 @@
-
-cmake_minimum_required(VERSION 3.8)
-
-project(<工程名字>)
-
-add_executable(<待生成的可执行文件的名字> <待编译的cpp文件名字>)
