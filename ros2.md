@@ -72,11 +72,13 @@
 查找文件步骤：
 （1）通过环境变量：AMENT_PREFIX_PATH
 （2）查找：lib/package_name(功能包名)/exacuteable_name(可执行文件名)
-#### source：添加 环境变量
+#### source ：添加 环境变量
 
-#### node list：查看 当前节点列表
+#### node ：查看 节点相关信息
 ```c
-    ros2 node list		// 查看当前 正在运行 的节点
+    ros2 node list		// 查看当前 正在运行 的节点列表
+
+    ros2 node info <正在运行的节点路径>     // 查看指定节点的详细信息
 ```
 
 
@@ -103,15 +105,63 @@ def main():
 if __name__=='__main__':            
     main()
 ```
+2. **C++文件**的node初始化
+  - C++**源程序**
+```c
+#include"rclcpp/rclcpp.hpp"             // 引入头文件.hpp【需要导入库，使用CMakeList查找并导入】
+
+int main(int argc,char** argv){         // 固定写法，使用args：具体看 learn_args.cpp           
+
+    // 1. ros初始化
+    rclcpp::init(argc,argv);            // 其中，argc和argv可以传递给rclcpp中，可用于修改其它东西。
+    
+    // 2. 创建node节点,名字为：cpp_node
+    auto node = std::make_shared<rclcpp::Node>("cpp_node");   // 创建rclcpp下的node的共享指针。（make_share为共享指针）
+
+    // 自定义功能
+
+    // 3. 运行节点，循环直到中断
+    rclcpp::spin(node);                 // spin是不断循环检测，并处理node事件
+
+    // 4. 关闭节点，清理资源
+    rclcpp::shutdown();
+
+    return 0;
+}
+```
+  - C++**编译：CMakeList**(需要导入头文件与库文件)
+```c
+// cmake基础
+cmake_minimum_required(VERSION 3.8)
+
+project(ros2_cpp)
+
+add_executable(ros2_cpp_node ros2_cpp_node.cpp)     # 可执行文件 与 c++文件
+
+// 难点，重点：查找头文件包
+find_package(rclcpp REQUIRED)           # 必须有，才能打印
+message(STATUS ${rclcpp_INCLUDE_DIRS})  # 打印 rclcpp的头文件路径及rclcpp依赖的头文件
+message(STATUS ${rclcpp_LIBRARIES})     # 打印 rclcpp的库文件及rclcpp以来的库文件
+
+// 难点，重点：将头文件和库文件，与c++文件连接
+target_include_directories(ros2_cpp_node PUBLIC ${rclcpp_INCLUDE_DIRS}) # 头文件包含
+
+target_link_libraries(ros2_cpp_node ${rclcpp_LIBRARIES})    # 库文件连接
+```
+
 ### 2.日志打印【 node.get_logger() 】
 #### 参数
 
 #### 程序
 - python程序：(在 `rclpy.spin(node)`前执行)
-```pythoin
+```py
     
     node.get_logger().info('Hello World!')  # 获取并使用get_logger日志管理模块，打印info级别的提示
 
+```
+- c++程序：(在 `rclcpp::spin(node)`前执行)
+```c
+    RCLCPP_INFO(node->get_logger(),"hello world!")  // RCLCPP_INFO 为一个 宏定义; 使用node指针 找到get_logger函数
 ```
 #### 输出
 输出内容：`[级别] [时间辍] [节点名字] : [打印内容]`
