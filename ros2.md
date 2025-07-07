@@ -66,7 +66,7 @@
 ### 3.ROS2 命令
 #### run：运行命令[通过环境变量查找文件]
 ```c
-    ros2 run <功能包的名字> <可执行文件的名字>          // 本质：就是 运行可执行文件
+    ros2 run <功能包的名字> <可执行文件的名字>      // 本质：就是 运行可执行文件
 ```
 注意：ros2 run 是通过**环境变量（AMENT_PREFIX_PATH=/opt/ros/humble）来查找功能包以及可执行文件的**（不是在当前目录）
 查找文件步骤：
@@ -168,13 +168,170 @@ target_link_libraries(ros2_cpp_node ${rclcpp_LIBRARIES})    # 库文件连接
   - 级别：（1）info：普通级别；（2）warn：警告级别
   - 时间辍：从1970年至今的 秒数
 
+## 五、功能包 pkg   【组织节点的工具】（在 功能包 中编写节点）
+### Python语法：
+1. 创建功能包 package：
+```py
+# 其中： --build-type ament_python ：表示 使用的构建类型 为 ament_python
+#       --license Apache-2.0     : 表示 证书 为 Apache-2.0 
+ros2 pkg create <功能包名> --build-type ament_python --license Apache-2.0
+```
+后生成功能包文件夹，包含：
+  - 文件夹 功能包名：存放 **节点代码** 的文件夹。
+  - 文件夹 resource：
+  - 文件夹 test：存放 **测试代码** 的文件夹。
+  - LICENSE：功能包的许可证.
+  - package.xml	： 功能包 清单文件。用于声明 依赖库
+  - setup.cfg：存放 python包的 配置选项。
+  - setup.py：构建脚本文件。
+2. 在里层`功能包名`文件夹中：新建 python_node.py 并 填写代码
+3. 节点的注册与声明：在`setup.py`文件中，对main函数进行声明
+```py
+	# 相当于 main函数 与 可执行文件 进行映射
+	entry_points={
+		'console_scripts':[
+			# 在 此处进行声明
+			'<可执行文件名(自己取)> = <功能包名字>.<节点的文件名>:main'
+		]
+	}
+```
+4. 依赖库的声明：在`package.xml`中，添加需要的 依赖库信息。如：
+```py
+    # 在 </license> 后，添加
+	<depend> 依赖库名 </depend>		# 如：<depend>rclpy</depend>
+```
+5. 功能包 **构建 colcon build**：
+```py
+	# 构建 功能包
+	colcon build
+```
+- 构建后，会 在上层目录 生成三个文件夹：
+  - 文件夹 build： 存放 构建过程中 产生的 中间文件。
+  - 文件夹 install：存放 **构建结果**的文件夹。
+  构建后，生成的可执行文件，在：
+	`install -> 功能包名 -> lib -> 功能包名 -> 可执行文件`
+  - 文件夹 log：
+- 注意：运行的代码 是 被拷贝在lib中的代码，不是之前功能包中的代码。
+- 所以：更改代码后，==一定要重新构建==
+6. 构建、编译后，一定要**生成 并 修改环境变量**：
+```py
+	# 生成 环境变量
+	# 通过source 运行 install文件夹下 的 setup.bash文件
+	# 该文件是 将环境添加至系统环境变量 的脚本
+	source install/setup.bash
+	
+	# 修改 环境变量
+	echo $AMENT_PREFIX_PATH
+```
+7. 运行 功能包下的节点
+```c
+	ros2 run <功能包名> <节点名>
+```
 
 
+#### c++语法：
+1. 创建功能包 package：
+```c
+    // 其中： --build-type ament_cmake ：表示 使用的构建类型 为 ament_cmake
+    //       --license Apache-2.0     : 表示 证书 为 Apache-2.0 
+ros2 pkg create <功能包名> --build-type ament_cmake --license Apache-2.0
+```
+生成一个 功能包目录，包含：
+  - 文件夹 include：存放 C++头文件
+  - 文件夹 src：存放 节点及相关代码
+  - CMakeLists.txt：c++编译配置文件
+  - LICENSE：许可证
+  - package.xml：功能包的清单文件，包含 依赖信息。
+2. 在 `src`文件夹下 新建文件，在文件中 编写 节点代码。
+3. 节点的声明 与 拷贝文件：**配置 CMakeLists.txt文件**：
+在`find_package(ament_cmake REQUIRED)`后，添加：
+```c
+find_package(<依赖库名> REQUIRED)           // 查找库（紧贴着find_package）
 
+add_executable(<可执行文件executable名> <src/节点.cpp >) // 添加并命名 可执行文件
 
+ament_target_dependencies(<可执行文件名> <依赖库名>)	// 功能包中，独有
+
+// install安装命令 
+// 拷贝文件：将build目录下的executable文件 拷贝至 install目录下的lib中
+// 其中，${PROJECT_NAME}会随 工程名变化
+install( 
+	TARGETS <executable file>	
+	DESTINATION lib/${PROJECT_NAME}	
+)
+```
+4. 依赖库的声明：在 功能包文件夹 下的**package.xml**中，添加依赖信息。
+```c
+	// 在</license>后，另起一行，添加
+	<depend> 依赖库 </depend>			// 如：rclpy
+```
+5. 在上级目录下(chapt文件夹下)，**构建 colcon build**:
+```c
+	colcon build
+```
+6. 添加 环境变量
+```c
+	source install/setup.bash
+```
+7. 运行 功能包下的 节点程序文件
+```c
+	ros2 run <功能包名> <可执行文件名>
+```
 
 # ROS2常见的错误
-## package '...' not found：可能没有配置环境变量 或 环境变量下没有该功能包
+## package '...' was not found：可能没有配置环境变量 或 环境变量下没有该功能包
 解决办法：
 （1）查看环境变量（AMENT_PREFIX_PATH）下的文件有没有该功能包
 （2）若没有，则添加功能包 或者 使用source添加环境变量
+
+
+# 功能包 结构目录
+## 1. build
+## 2. package名字
+### package文件夹
+用途：放置 节点代码 的文件夹。【开发文件的主战场】
+#### \_\_init\_\_.py 文件
+为 python包 的标识文件。
+（若包含该文件，则为 一个python包）
+### resource 文件夹（一般不用管）
+用途：放置一些资源。提供 功能包的标识。
+### test 文件夹
+用途：测试代码文件夹。存放 测试代码 的文件。
+  - 对 package中的代码，进行测试并生成报告
+### LICENSE
+功能包的许可证。用于 保护知识产权用。【一般使用 Apache-2.0】
+### package.xml
+声明了 功能包的 名称、版本编号、构建类型、许可证等信息。
+### setup.cfg
+存放 python包的 配置选项。
+### setup.py
+构建脚本文件。包含 setup函数，用于指定 如何构建功能包，声明 可执行文件的名称等
+
+## 3. install
+用途：用于 存放 构建结果 的文件夹
+### 1. package 名字
+#### lib
+##### package 名字
+用途：存放 生成后的==可执行文件==。
+##### python版本
+用途：在此处 可查看 **源文件程序**。
+原因：系统 将源文件 拷贝一份放到 该目录喜下的package文件夹中。
+重点：==系统运行的是 该目录下的 源函数文件==
+#### share
+## 4. log
+
+# 做测试
+1. 做测试时，可以先将 单独的文件进行 编译。
+  - python：`python3 文件名`
+  - C++：`./a.out（或 可执行文件名）`
+
+2. 测试好后，再将其放入 工程文件夹中 进行构建。
+
+# ROS2语法
+## ros2 run
+## ros2 pkg : 功能包相关
+### create
+### prefix：
+```c
+	ros2 pkg preflex <功能包名>		// 查看 功能包的路径
+```
