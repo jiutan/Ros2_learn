@@ -278,6 +278,31 @@ install(
 	ros2 run <功能包名> <可执行文件名>
 ```
 
+## 六、工作空间 Workspace
+1. Workspace：一个完整的机器人项目，往往由多个不同的 功能模块组成，所以就需要 多个功能包进行组合。（workspace 只是一个 概念，其实 ==本质 就是一个**文件夹**==）
+
+### 1. 创建 工作空间
+```c
+	// -p:表示 创建双重文件夹： 文件夹1/文件夹2(文件夹1 下的 文件夹2)
+	mkdir -p <文件夹名>_ws/src
+```
+### 2. 构建 功能包
+```c
+	// 构建 工作空间中 所有的功能包
+	colon build
+	
+	// 构建 工作空间下 单独的功能包
+	colcon build --packages-select <pkg名字>
+```
+### 3. 调整 构建的先后顺序（功能包的依赖顺序）
+若   想先构建 CPP文件，再构建 python文件
+需  将cpp文件 ，放入 python功能包中的依赖途径`package.xml`中
+```c
+	// 在 python功能包中的 package.xml 文件中
+	// 在 <buildtool_depend> 前 加入
+	<depend>demo_cpp_pkg</depend>
+```
+
 # ROS2常见的错误
 ## package '...' was not found：可能没有配置环境变量 或 环境变量下没有该功能包
 解决办法：
