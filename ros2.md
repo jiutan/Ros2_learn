@@ -302,6 +302,8 @@ install(
 	// 在 <buildtool_depend> 前 加入
 	<depend>demo_cpp_pkg</depend>
 ```
+## 
+
 
 # ROS2常见的错误
 ## package '...' was not found：可能没有配置环境变量 或 环境变量下没有该功能包
@@ -359,4 +361,162 @@ install(
 ### prefix：
 ```c
 	ros2 pkg preflex <功能包名>		// 查看 功能包的路径
+```
+
+# 编程基础
+## 一、面向对象编程
+1. 定义：
+2. 三大特性：
+  - ==封装==
+  - ==继承==
+  - ==多态==
+3. 方法 与 函数：【通过==点运算==区分】（在 类 中）
+  - 方法： 类.函数名()
+  - 函数：直接定义 函数名
+
+4. 
+### 1. 类
+1. 第一步： 是创造一个==类==（包含 属性 和 方法）【定义类：class】
+  - 属性：**属性不能重复**
+  - 方法：**方法可以共用**
+```py
+class PersonNode:	# 只是个 类，还不是对象
+	# 定义 类的属性
+	def__init__(self,name:str,age:int)->None: 
+		self.age = age;
+		selg.name = name;
+	# name:str 说明 name 是 str类型
+	# age:int 说明 age 是 int类型
+		
+	# 定义 类的方法
+	def eat(self,food_name:str):
+		print('')
+```
+```c
+// 定义 一个类class
+class PersonNode : public rclcpp::Node
+{
+    // 声明 成员数据（属性）【私有 成员】
+private: // 成员声明： 数据类型  成员名      ； 加入 下划线 表示为 私有成员
+    std::string name_;
+    int age_;
+
+    // 声明 成员函数（方法、构造函数）【共有 函数，可被调用】
+public:
+    PersonNode(const std::string &name, const int age)
+    {
+        // 对 成员数据（属性） 进行 赋值: 使用 this -> 属性 = 形参      [this 表示 这个 类]
+        this->name_ = name;
+        this->age_ = age;
+    }
+
+    // 声明 方法
+    void eat(const std::string &food_name)
+    {
+		std::cout << food_name << std::endl;
+    }; // 短函数，可在 类中定义（结尾需加分号；）
+
+}; // 必须有 分号；
+
+```
+2. 第二步：对==类进行**实例化**==【基于 类的模板，使用自己的参数，来生成一个对象】
+```py
+	# 生成 实例化对象 node
+	node = PersonNode('张云旭','25')		// 里面是 具体的 类的属性
+	
+	# 调用 对象的方法
+	node.eat('鱼香肉丝')
+```
+### 2. 继承
+1. 优点：使用 继承 可以 很方便创建 基于一个类的 新的类
+2. 方法：
+```py
+# 从 rclpy功能包中的rclpy_node节点文件内，导入 Node类
+import rclpy
+from rclpy.node import Node
+
+# 创建一个 PersonNode类
+class PersonNode(Node):	# 在（）内，添加待继承的父类Node
+	# 定义 属性（包含父类的属性）
+	def __init__(self,node_name:str,name:str,age:int) -> Node:		
+		# 从 父类(super)中，继承父类的__init__方法内的属性
+		super().__init__(node_name)	# 并且 传入 node_name参数
+		
+		# 创建 子类中 独特的 属性
+		self.name = name
+		self.age = age
+	
+	# 创建 与 继承 类的方法
+	def eat(self,food_name:str)			# 创建 PersonNode类的方法
+		# 已经继承了 父类，所以 使用 self 可直接调用父类的方法
+		self.get_logger().info(f"{self.name}今天过了自己的{self.age}岁的生日，并且吃了{food_name}")         
+```
+```py
+def main():
+    rclpy.init()        # 初始化节点,分配资源
+    
+    # 实例化：创建对象node
+    node = PersonNode('jiedian','zyx',25)
+    # 使用对象，调用方法
+    node.eat('蛋糕')
+
+    rclpy.spin(node)    # 运行节点对象，并收集事件与执行
+    rclpy.shutdown()    # 关闭节点，并清理内存
+```
+```c
+// 定义 一个类class
+class PersonNode : public rclcpp::Node
+{ // 继承 使用 public；继承 rclcpp包 下的 Node类
+
+    // 声明 成员数据（属性）【私有 成员】
+private: // 成员声明： 数据类型  成员名      ； 加入 下划线 表示为 私有成员
+    std::string name_;
+    int age_;
+
+    // 声明 成员函数（方法、构造函数）【共有 函数，可被调用】
+public:
+    // 设置成员数据，通过初始化列表(onst std::string &node_name)，来显式地调用 父类Node()的 成员数据/属性
+    PersonNode(const std::string &node_name, const std::string &name, const int age)
+        : Node(node_name) /* 调用 父类 的 构造函数*/ // 将PersonNode获取的node_name，传入 父类Node中
+    {
+        // 对 成员数据（属性） 进行 赋值: 使用 this -> 属性 = 形参      [this 表示 这个 类]
+        this->name_ = name;
+        this->age_ = age;
+    }
+
+    // 声明 方法
+    void eat(const std::string &food_name)
+    {
+
+        // 使用 node父类的方法: 使用 this 说明 get_logger()是 继承到该类中的
+        RCLCPP_INFO(this->get_logger(),"我是%s,%d岁，爱吃%s", this->name_.c_str(), // name_.c_str() 将 char类型的name 转换成 str类型
+                    this->age_, food_name.c_str());                        // name 与 age 都为 私有属性，所以用 this 来调用
+
+    }; // 短函数，可在 类中定义（结尾需加分号；）
+
+}; // 必须有 分号；
+```
+```c
+int main(int argc,char **argv){
+
+    // 初始化 节点
+    rclcpp::init(argc,argv);
+    
+    // 创建对象:实例化 类
+    // make_shared 将 node 变为一个 PersonNode类的指针  【智能指针】
+    auto node = std::make_shared<PersonNode>("person_node","zyx",18);     // 将 PersonNode需要的参数(包括父类需要的)，都加上
+    // 打印日志
+    RCLCPP_INFO(node->get_logger(),"hello c++ node");
+    
+    // 运行 eat
+    node -> eat("鱼香肉丝") ;               // 使用 -> 来 调用 成员函数（方法）
+
+    // 运行 节点
+    rclcpp::spin(node);
+    // 清理内存
+    rclcpp::shutdown();
+    
+    return 0;
+}
+
 ```

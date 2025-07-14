@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.8)
 project(<工程名字>)
 
 # 3.添加可执行executable文件：将cpp文件 编译 生成 该可执行文件
-add_executable(<待生成的可执行文件的名字> <待编译的cpp文件名字>)
+add_executable(<待生成的可执行文件的名字> <待编译的cpp文件名字(相对目录)>)
 
 # 4.直接查找到 头文件和库文件 并引入: 找到需要用的头文件
 find_package(<需要查找的头文件夹名> REQUIRED)

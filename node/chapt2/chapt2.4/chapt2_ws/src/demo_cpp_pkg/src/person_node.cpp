@@ -39,7 +39,7 @@ int main(int argc,char **argv){
     rclcpp::init(argc,argv);
     
     // 创建对象:实例化 类
-    // make_shared 将 node 变为一个 PersonNode类的指针 
+    // make_shared 将 node 变为一个 PersonNode类的指针  【智能指针】
     auto node = std::make_shared<PersonNode>("person_node","zyx",18);     // 将 PersonNode需要的参数(包括父类需要的)，都加上
     // 打印日志
     RCLCPP_INFO(node->get_logger(),"hello c++ node");
