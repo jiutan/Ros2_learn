@@ -12,10 +12,13 @@ find_package(rclcpp REQUIRED)           # 必须有，才能打印
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+# 包含目录 的 命令：include_directories
+include_directories(include)            # 包含 include头文件目录
 
-# 在这里 添加 生成可执行文件 以及 连接的cpp文件
+# 【需修改】在这里 添加 生成可执行文件 以及 连接的cpp文件
 add_executable(cpp_node src/cpp_node.cpp)
 add_executable(person_node src/person_node.cpp)
+add_executable(learn_thread src/learn_thread.cpp)
 
 
 # message(STATUS ${rclcpp_INCLUDE_DIRS})  # 打印 rclcpp的头文件路径及rclcpp依赖的头文件
@@ -25,14 +28,15 @@ add_executable(person_node src/person_node.cpp)
 # target_link_libraries(cpp_node ${rclcpp_LIBRARIES})    # 库文件连接
 # 下面 替代 上面的两句话
 
-# # 在这里，连接 下库
+# 【需修改】 在这里，连接 下库
 ament_target_dependencies(cpp_node rclcpp)
 ament_target_dependencies(person_node rclcpp)
 
 
 
+
 install(
-  TARGETS cpp_node person_node                        # 在这里 添加 可执行文件，使其放入 lib 下
+  TARGETS cpp_node person_node learn_thread                       # 【需修改】在这里 添加 可执行文件，使其放入 lib 下
   DESTINATION lib/${PROJECT_NAME}
 )
 

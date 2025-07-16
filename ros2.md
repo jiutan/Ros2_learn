@@ -518,5 +518,138 @@ int main(int argc,char **argv){
     
     return 0;
 }
+```
+## 二、C++ 的新特性
+### 1. 自动类型推导 auto
+1. 自动识别类型：`auto 变量 = 表达式`
+2. 根据 表达式，自动推导变量的类型，并且 赋予类型
+```c
+	auto node = ...
+```
+### 2. 智能指针 
+1. 语法：`make_shared<类>(参数)`
+2. 使用 该语法，就能创造出一个指针
+3. 作用： 可以 **管理 动态分配的内存、避免 内存的泄漏、空指针**等问题。
+4. C++11，提供了 三种 智能指针：
+  - unique_ptr
+  - ==shared_ptr 共享指针==
+  - weak_ptr
+##### 共享指针
+1. 作用：每用一次，都会==创建一次 **引用计数**（引用数量+1）==。当使用一次引用，就会减1,==使用完会 **自动释放内存**==。
+
+2. 本质：开辟一个堆区，用完后可以自动释放。（new 是 手动释放）
+3. **头文件**：`#include<memory>`
+4. 语法：`std::make_shared<数据类型/类>(参数)`
+  - 参数：为 创建该 **数据类型/类 所需的 参数（实参）**
+  - **返回值**：为 ==对应类中**参数的共享指针**==【指向 参数的 地址】
+5. **释放引用**：`对象.reset()`
+6. 查看 相关功能：
+  - 查看 引用次数：`对象.use_count()`
+  - 查看 指针指向的地址：`对象.get()`
+  - 查看 指向的内存地址**具体数据**：`对象 -> c_str()`
+```c
+#include<memory>
+
+// make_shared<数据类型/类>(参数)
+// 其中，参数：为 创建该 数据类型/类 所需的 参数
+// 返回值：为 对应类中 参数 的共享指针
+int main(){
+	// 创建对象p1.此时，p1指向"this is a str"的地址 被引用了一次
+	auto p1 = std::make_shared<std::string>("this is a str");	
+	
+	// 使用 .use_count() 来 得到 指向内存地址的 引用次数
+    std::cout << "p1 的 引用计数" << p1.use_count() << std::endl; // 为 1
+
+    // 使用 .get() 来 获取 共享指针的地址(内存地址 为 p1指向的地址)
+    std::cout << "指针指向的内存地址为" << p1.get() << std::endl;   
+	
+	// p1 指针 调用成员方法c_str()将内存地址数据 用字符串打印出来
+	 std::cout << "p1 指向的内存地址 数据：" << p1 -> c_str() << std::endl;  // 打印为 this is a str
+     
+	// 释放内存
+	p1.reset();// 此时，p1不再指向"this is a str"地址，引用次数为0,地址也为0。				
+}
+```
+7. 优点：
+- 无论 智能指针 进行 拷贝或者分享 多少份，其 **内存地址都不变**。==运行效率会提高==。
+- 当所有程序 使用完内存地址 之后，会**自动的回收**。==不会造成内存泄漏==
+
+### 3. Lambda 表达式（定义函数 的一种方法）
+1. 性质：**匿名函数**（没有名字）
+2. 头文件：`#include<algorithm>`（算法库）
+3. 语法：`[capture list](parameters) -> return_type{ function body }`
+  - capture list：捕获参数列表（将捕获到的变量 传至 { }作用域中）
+    - 当 为 ==[&]==：表示 捕获 上限文中所有的变量（都可在作用域中使用） 
+  - parameteres：函数的参数列表。（形参列表）
+  - -> ：指针 指向 返回值
+  - return_type：函数 返回值的类型
+  - {function body}：函数体
+```c
+	#include<algorithm>
+	int main(){
+		auto 对象 = [capture](parameter) -> return_type { 表达式; };
+	}
+```
+### 4. 函数包装器（可以保护数据）
+1. C++中的 **三种函数**：
+  - ==自由函数==： 自己定义的函数
+  - ==成员函数==：在 类的内部
+  - ==Lambda函数==：
+2. 函数包装器 的 功能：为了**统一 这三种 函数**。（更安全）
+#### 包装
+1. 函数包装器 的 **头文件**：`#include<functional>`
+2. 函数包装器 的 **代码**：
+    ==`std::function<返回类型(形参的类型列表)> 包装后的对象 = 函数名`
+  - 其中，<> 中 放的是 函数模板
+  - 若为**成员函数**，则需要使用 bind绑定。
+3. 类的成员函数 需要通过 **bind绑定**：`std::bind(类指针，对象指针，占位符)`的参数
+  - **类的指针**：类 对应的方法(模板)的 指针/地址。==`&类名::成员函数名`==
+  - **对象的指针**：对象 的 指针/地址。==`&类的对象`==，可以用**`this`来代替**
+  - **占为符 列表**：假如 有 n个数量的形参。注意：**从1开始,2,3,直到n**
+  - ==`std::placeholders::_1,std::placeholders::_2,...`== 
+4. 举例：
+```c
+// 导入 函数包装器 的 头文件
+#include<functional>
+
+// 将 自由函数save_with_freefun 包装成 save1   
+std::function<void(const std::string& )> save1 = save_with_freefun;  
+ // 将 lambda函数save_with_lambda 包装成 save2
+std::function<void(const std::string& )> save2 = save_with_lambda;     
+// 将 file_save类 的 成员函数save_with_class 放入 包装器:【需要 绑定bind】
+std::function<void(const std::string& )> save3 = std::bind(&FileSave::save_with_class,&file_save,std::placeholders::_1);
+```
+#### 调用 函数包装器
+1. 语法：`包装后的对象(要传入的实参);`
+2. 比如：
+```c
+ 	// 调用 包装函数
+    save1("file.txt");
+    save2("file.txt");
+    save3("file.txt");
+```
+## 三、 多线程 与 回调函数
+1. 多线程 Multi-threading ：多个程序，并行运行
+2. 回调函数 ： 当多线程的任务完成后，传递给 回调函数，哪个任务完成，就传递给哪个。（省时）
+3. 多线程的缺点：线程数量过多，会影响 系统的调度
+4. 注意：在 ros2中，往往用单线程。当 逻辑运算多时，用 多线程 
+4. 程序：Python
+```py
+def 函数(self,形参):
+	# 创建对象，创建一个新的线程。 target 线程启动后执行的目标函数, args 为 目标函数的形参
+	thread = threading.Thread(target=目标函数,args=(目标函数的形参))
+	# 启动线程
+	thread.start()
+
+def main():
+	# 创建对象
+	对象 = 函数()
+	
+	# 使用 线程
+	对象.函数(形参)
 
 ```
+5. 程序：C++
+  - 头文件：`#include<thread>`
+  - 与 时间 相关的 头文件：`#include<chrono>`
+
