@@ -327,8 +327,31 @@ install(
 ```c
 // 让 小海龟 动起来
 ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0} , angular: {z: -1.0}}"
-
 ```
+### 2. 【项目】通过 话题 发布 小说 
+1. 实现功能：下载 小说，并通过 话题 间隔5s 发布一行
+2. 核心问题：
+  1) 怎么下载 小说？		request
+  2) 怎么发布？			 确定 话题名字 和 消息接口(string接口)
+  3) 怎么间隔5s发布？	        TImer定时器
+3. 搭建 网站 并 开启 服务器：`python3 -m http.server`
+  - 会将 文件夹 下的内容，传至 服务器
+
+#### 项目实现
+第一步：创建 工作空间：
+  - 使用的 依赖包：`rclpy`和`example_interfaces`
+```c
+// 在 ws/src 下 创建 工作空间
+ros2 pkg create demo_python_topic --build-type ament_python --dependencies rclpy example_interfaces --license Apache-2.0
+// 在 ws 下 构建
+colcon build
+```
+#### 项目检查
+1. 查看 正在发布的话题 列表：`ros2 topic list`
+2. 查看 话题 的 内容：`ros2 topic echo 话题名字`
+3. 查看 话题 发布 的 频率：`ros2 topic hz 话题名字`
+
+
 
 
 
@@ -389,6 +412,14 @@ ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.
 ### prefix：
 ```c
 	ros2 pkg preflex <功能包名>		// 查看 功能包的路径
+```
+## ros2 interface list：查看 功能包内 有什么文件
+## ros2 interface show：查看 功能包 内 文件的 具体内容
+1. 功能 ： 查看 功能包的 具体内容。`ros2 功能包 show 具体文件`
+
+如： 查看 example_interfaces/msg/String 的内容
+```c
+ros2 interface show example_interfaces/msg/String
 ```
 
 # 编程基础
