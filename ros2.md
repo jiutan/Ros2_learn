@@ -328,7 +328,8 @@ install(
 // 让 小海龟 动起来
 ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0} , angular: {z: -1.0}}"
 ```
-### 2. 【项目】通过 话题 发布 小说 
+### 2. Python 话题 的 发布与订阅
+#### 【项目1】通过 话题 发布 小说 
 1. 实现功能：下载 小说，并通过 话题 间隔5s 发布一行
 2. 核心问题：
   1) 怎么下载 小说？		request
@@ -336,8 +337,7 @@ ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.
   3) 怎么间隔5s发布？	        TImer定时器
 3. 搭建 网站 并 开启 服务器：`python3 -m http.server`
   - 会将 文件夹 下的内容，传至 服务器
-
-#### 项目实现
+##### 项目实现
 第一步：创建 工作空间：
   - 使用的 依赖包：`rclpy`和`example_interfaces`
 ```c
@@ -346,12 +346,27 @@ ros2 pkg create demo_python_topic --build-type ament_python --dependencies rclpy
 // 在 ws 下 构建
 colcon build
 ```
-#### 项目检查
+##### 项目检查
 1. 查看 正在发布的话题 列表：`ros2 topic list`
 2. 查看 话题 的 内容：`ros2 topic echo 话题名字`
 3. 查看 话题 发布 的 频率：`ros2 topic hz 话题名字`
+#### 【项目2】订阅小说 并 诸行朗读
+##### 核心问题：
+1. 怎么订阅？
+2. 用什么来 朗读文本？			**Espeak库**
+3. 小说来的快，读的太慢 怎么办？	 **使用 队列 可以 异步处理**
+##### 项目实现：
+1. 下载 Espeak库：`pip3 install espeakng`与`sudo apt install espeak-ng`
+2. 下载后，重启scode
+3. 写程序：
 
-
+##### 项目检查：
+##### 项目拓展：
+1. 拓展1：==优化声音==
+- 原因：声音难听，需要优化
+- 方案：接入**第三方API**
+2. 拓展2：小说单调，换个小说
+### 3. C++ 话题 的 发布与订阅
 
 
 
