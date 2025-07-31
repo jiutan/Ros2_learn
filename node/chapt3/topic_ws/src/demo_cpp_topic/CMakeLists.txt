@@ -10,16 +10,19 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+# 1. 寻找 使用的库
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(turtlesim REQUIRED)
 
-# 添加文件
+# 2. 添加 可执行文件
 add_executable(turtle_circle src/turtle_circle.cpp)
+# 3. 给 可执行文件 添加 依赖
+ament_target_dependencies(turtle_circle rclcpp geometry_msgs) 
 
-# 添加 依赖
-ament_target_dependencies(turtle_circle rclcpp geometry_msgs)
-
+add_executable(turtle_control src/turtle_control.cpp)
+ament_target_dependencies(turtle_control rclcpp geometry_msgs turtlesim)  
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -33,8 +36,8 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# 安装 到 哪里
-install(TARGETS turtle_circle
+# 4. 将 可执行文件 安装 到 install/lib 中
+install(TARGETS turtle_circle turtle_control
 DESTINATION lib/${PROJECT_NAME}
 )
 
