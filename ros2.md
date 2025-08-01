@@ -33,6 +33,8 @@
 	// 将 输出内容的前缀 改为： <运行命令的 行数>:<输出内容>
 	export RCUTILS_CONSOLE_OUTPUT_FORMAT=[{function_name}:{line_number}]:{message}
 ```
+### 3. C++ rclcpp库 的 路径配置
+`/opt/ros/humble/include/**`
 
 ## 三、Shell命令代码
 ### 1.输出打印指令【echo】【$的用途】
@@ -316,11 +318,11 @@ install(
     - 冒号：前的 为 **消息的名称**
     -  冒号：后的 为 **消息接口**
   - Publishers  ：发布者
-
-2. 实时查看 ==话题 的内容== ：`ros2 topic echo <话题的名字>`（<>省略）
-3. 查看 ==话题的 详细信息== ：`ros2 topic info <话题的名字> -v`
-4. 查看 ==消息接口的 定义的详细内容==：`ros2 interface show <消息接口的名字>`
-5. ==**发布 话题**==：`ros2 topic pub <话题的名字> <消息接口> "消息接口的内容填充"`
+3. 查看 正在运行的 ==话题列表--：**`ros2 topic list -t`**
+4. 实时查看 ==话题 的内容== ：`ros2 topic echo <话题的名字>`（<>省略）
+5. 查看 ==话题的 详细信息== ：`ros2 topic info <话题的名字> -v`
+6. 查看 ==消息接口的 定义的详细内容==：`ros2 interface show <消息接口的名字>`
+7. ==**发布 话题**==：`ros2 topic pub <话题的名字> <消息接口> "消息接口的内容填充"`
   - 消息内容填充：`"{vector: }"`				
     - 只要遇到 变量 就要加个{ }
     - 冒号: 后的 要添加 **空格**
@@ -431,8 +433,88 @@ colcon build
 4. 小海龟 的 话题：
   - 控制命令(订阅)：	话题：/turtle1/cmd_vel		消息接口：geometry_msgs/msg/Twist
   - 当前坐标(发布)：	话题：/turtle1/pose		消息接口：turtlesim/msg/Pose
+##### 项目实现
+##### 项目检查
 
+#### 【项目二】订阅 Pose 实现 闭环控制
+需求：告诉 小海龟 到指定位置，自己滚过去
+##### 分析问题：
+1. 小海龟 凭什么听我的？			
+  - 通过 **发布话题**
+    - 话题名称：`/turtle1/cmd_vel` 
+    - 话题类型/消息接口：`geometry_msgs/msg/Twist`
+2. 小海龟 现在在哪里？			
+  - 通过 **订阅话题**
+    - 话题名称：`/turtle1/pose`
+    - 话题类型/消息接口：`turtlesim/msg/Pose`
+3. 怎么根据 当前位置和目标位置 计算 角速度和线速度？		
+	答案： 两点之间距离 -> 线速度	； 当前朝向 和 目标朝向差 -> 角速度
+#### 4. 话题通信 实践
+##### 步骤一： 确认 需求
+1. 通过 该小工具，可以看到 系统的 实时状态信息，包括 记录信息的时间、主机名称、CPU使用率、内存使用率、内存总大小、剩余内存、网络接收数据量 和 网络发送数据量
+2. 要有一个 简单的界面，可以将 系统信息 显示出来
+3. 要能在 局域网内 的 其他 主机上 查看数据
+##### 步骤二：根据 需求 进行 分析
+1. 要获取 系统状态信息：	使用 python库中的 psutils
+2. 要 有一个 展示界面：	   使用 C++ 调用 Qt库
+3. 要能 共享数据：		     使用 ROS2话题 功能
+##### 步骤三：自定义 通信接口
+1. 原因：每个话题，都要有其 对应的 话题类型/通信接口。
+- 但是 ROS2中 接口是有限的 **没有满足符合所有需求的接口，需要 自定义 一个**
+2. ==在 项目中，要 根据 项目需求，去创建**自定义 的 通信接口**来 通信==
+###### 步骤：
+第一步：方法（使用C++功能包）：
+- 在工作空间 下 的 src文件夹下：使用`ros2 pkg create status_interfaces --dependencies builtin_interfaces rosidl_default_generators --license Apache-2.0`
+  - 功能包：status_interfaces
+  - 依赖（--dependencies）：
+    - builtin_interfaces：时间辍 消息接口
+    - rosidl_default_generators：将 自定义消息文件 转换成 C++/Python 源码的 模块
 
+第二步： 在 status_interfaces 文件夹 下 名字为 **`msg`**文件夹【规定好的名字，不能改】
+
+第三步：==在`msg`文件夹 下，创建**消息接口**文件==
+  - 消息接口 文件名：首字母需大写
+  - 消息接口 文件**后缀：`.msg`**
+    - SystemStatus.msg：
+
+第四步：对 消息接口 文件 进行 编写
+- 使用 interface 功能包
+- 若 该消息接口 依赖 interface功能包 中的 消息接口，则：**省略 中间的 msg**【规定】
+- 在 该文件 中，定义 接下来 需要使用的 消息接口
+
+第五步：将 该文件 在 **`CMakeLists.txt`**文件中 配置（在 `if(BUILD_TESTING)`前）
+- 添加 需要 的 依赖功能包：`find_package(rosidl_default_generators REQUIRED)`
+- 使用 用于 产生 功能包 的 指令：**`rosidl_generate_interfaces(参数)`**
+  - 该 cmake函数 指令 的 作用：** 将 msg等 消息接口定义文件，转换成 库或者头文件类**
+  - 参数：【规定：参数之间 用 ==回车== 隔开】
+    - 1. 工程名字：                    ${PROJECT_NAME} 
+    - 2. msg消息接口文件 的 相对路径：  "msg/消息接口文件.msg"  (若有多个 ，在 后面写即可，用 回车 隔开即可)
+    - 3. 自定义 新的消息接口 需要的依赖： DEPENDENCIES 需要的依赖
+```CMakeLists 
+rosidl_generate_interfaces( ${PROJECT_NAME}
+  "msg/SystemStatus.msg"
+  DEPENDENCIES builtin_interfaces
+)
+```
+
+第六步：在 `package.xml`文件中：（在`/license`后 添加）
+- 添加 命令：**`<member_of_group>rosidl_interface_packages</member_of_group>`**
+  - 作用：告诉大家，该== 功能包 是 **包含 消息接口** 的 功能包==
+
+第七步：`colcon build`编译（在 工作空间ws 编译）
+- 编译完后，会在`_ws/install/status_interfaces/include/msg`路径下
+==生成 C++ 所需 的 **`消息接口文件名.hpp`**文件==
+  - 其中，生成的 类 在 `detail/消息接口__struct.hpp`文件下 声明
+- 会在 `status_interfaces/local/lib/python3.10/status_interfaces/msg`路径下
+==生成 python 文件 __init__.py，里面有 导入库的语句：（需 与 文件内的 一致）
+**`from status_interfaces.msg._system_status import SystemStatus`**
+
+第八步：使用 生成的 hpp 文件 和 python库 进行 下一步操作
+
+###### 查看 消息接口 具体内容
+可以使用 `ros2 interface show 功能包名/msg/消息接口文件` 来查看
+
+##### 步骤四：使用 自定义消息接口 
 
 
 # ROS2常见的错误
