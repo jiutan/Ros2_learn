@@ -503,7 +503,7 @@ rosidl_generate_interfaces( ${PROJECT_NAME}
 
 第七步：`colcon build`编译（在 工作空间ws 编译）
 - 编译完后，会在`_ws/install/status_interfaces/include/msg`路径下
-==生成 C++ 所需 的 **`消息接口文件名.hpp`**文件==
+  ==生成 C++ 所需 的 **`消息接口文件名.hpp`**文件==
   - 其中，生成的 类 在 `detail/消息接口__struct.hpp`文件下 声明
 - 会在 `status_interfaces/local/lib/python3.10/status_interfaces/msg`路径下
 ==生成 python 文件 __init__.py，里面有 导入库的语句：（需 与 文件内的 一致）
@@ -513,15 +513,29 @@ rosidl_generate_interfaces( ${PROJECT_NAME}
 
 ###### 查看 消息接口 具体内容
 可以使用 `ros2 interface show 功能包名/msg/消息接口文件` 来查看
-
 ##### 步骤四：使用 自定义消息接口 
+1. 在 创建功能包 时：要 加入 **消息接口依赖**，`--dependencies 消息接口功能包名/`
+2. 在代码中：
+导入 自定义的消息接口：**`from 消息接口功能包名.msg import 消息接口文件名`**
+
+###### 系统消息 的 获取与 发布
+1) 在src中：构建 python功能包
+`ros2 pkg create py_status_publisher --build-type  ament_python --dependencies rclpy status_interfaces/ --license Apache-2.0`
+2) s
+
+
 
 
 # ROS2常见的错误
-## package '...' was not found：可能没有配置环境变量 或 环境变量下没有该功能包
+### package '...' was not found：可能没有配置环境变量 或 环境变量下没有该功能包
 解决办法：
 （1）查看环境变量（AMENT_PREFIX_PATH）下的文件有没有该功能包
 （2）若没有，则添加功能包 或者 使用source添加环境变量
+
+## 查看 ros2 topic echo /话题名称 时，报错：
+### 错误：The message type '话题类型' is invalid
+- 原因：当前命令窗口 的 环境变量 没有 更新
+- 解决办法：在 工作空间 目录下 使用 `source intall/setup.bash`
 
 
 # 功能包 结构目录
