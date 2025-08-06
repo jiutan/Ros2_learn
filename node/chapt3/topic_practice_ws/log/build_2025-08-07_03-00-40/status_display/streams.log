@@ -1,0 +1,15 @@
+[0.019s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/status_display': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/status_display -- -j12 -l12
+[0.096s] [ 50%] [32mBuilding CXX object CMakeFiles/hello_qt.dir/src/hello_qt.cpp.o[0m
+[1.463s] [01m[K/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/src/status_display/src/hello_qt.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[1.463s] [01m[K/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/src/status_display/src/hello_qt.cpp:13:5:[m[K [01;31m[Kerror: [m[K‘[01m[KQLable[m[K’ was not declared in this scope; did you mean ‘[01m[KQLabel[m[K’?
+[1.463s]    13 |     [01;31m[KQLable[m[K* label = new QLabel();
+[1.464s]       |     [01;31m[K^~~~~~[m[K
+[1.464s]       |     [32m[KQLabel[m[K
+[1.469s] [01m[K/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/src/status_display/src/hello_qt.cpp:13:13:[m[K [01;31m[Kerror: [m[K‘[01m[Klabel[m[K’ was not declared in this scope; did you mean ‘[01m[KQLabel[m[K’?
+[1.469s]    13 |     QLable* [01;31m[Klabel[m[K = new QLabel();
+[1.469s]       |             [01;31m[K^~~~~[m[K
+[1.469s]       |             [32m[KQLabel[m[K
+[1.669s] gmake[2]: *** [CMakeFiles/hello_qt.dir/build.make:76：CMakeFiles/hello_qt.dir/src/hello_qt.cpp.o] 错误 1
+[1.669s] gmake[1]: *** [CMakeFiles/Makefile2:137：CMakeFiles/hello_qt.dir/all] 错误 2
+[1.669s] gmake: *** [Makefile:146：all] 错误 2
+[1.671s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/status_display' returned '2': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/status_display -- -j12 -l12

@@ -521,7 +521,50 @@ rosidl_generate_interfaces( ${PROJECT_NAME}
 ###### 系统消息 的 获取与 发布
 1) 在src中：构建 python功能包
 `ros2 pkg create py_status_publisher --build-type  ament_python --dependencies rclpy status_interfaces/ --license Apache-2.0`
-2) s
+2) 
+
+##### 步骤五： 订阅 数据 并用 QT 显示
+1. Qt：跨平台的软件设计与 开发工具
+2. 作用：可以用于 **界面  显示 的 设计**
+###### 在 功能包中 使用 Qt（学习 完成 界面显示 功能）
+1. 创建 Qt功能包 ：
+  - 构建类型：`--build-type ament_cmake`
+  - 依赖：`--dependencies rclcpp 自定义消息接口功能包`
+  - 许可证：`--license Apache-2.0`
+
+2. Qt 相关的 头文件：
+```c
+#include<QApplication>
+#include<QLabel>
+#include<QString>
+```
+3. Qt 相关的 类 与 实现：
+```c
+int main(int argc,char *argv[]){
+	QApplication app(argc,argv);
+	QLabel* label = new QLabel();
+	QString message = QString::fromStdString("Hello Qt!");
+	label -> setText(message);
+	label -> show();
+	app.exec();
+	return 0;
+}
+```
+4. CMakeLists.txt 填写：
+  1. **查找库** Qt5 图形界面组件：`find_package(Qt5 REQUIRED COMPONENTS Widgets)`
+    - COMPONENTS：说明 添加的组件
+    - Widgests：Qt 图形界面 组件
+  2.**生成可执行文件**
+添加 可执行文件：`add_executable(可执行文件名 src/待生成文件的路径)`
+  3. **链接库**
+给 可执行文件 添加 Qt5 的 依赖：`target_link_libraries(可执行文件 Qt5::Widgets)`
+    - target_link_libraries：因为 Qt5 不是 ros库中的，所以使用 该命令
+  4. **拷贝** ：在 endif 下 加上 install 参数
+```c
+install(TARGETS 可执行文件名
+DESTINATION lib/${PROJECT_NAME}
+)
+```
 
 
 
