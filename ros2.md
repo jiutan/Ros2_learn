@@ -552,12 +552,14 @@ int main(int argc,char *argv[]){
 ```
 4. CMakeLists.txt 填写：
   1. **查找库** Qt5 图形界面组件：`find_package(Qt5 REQUIRED COMPONENTS Widgets)`
+
     - COMPONENTS：说明 添加的组件
     - Widgests：Qt 图形界面 组件
   2.**生成可执行文件**
 添加 可执行文件：`add_executable(可执行文件名 src/待生成文件的路径)`
   3. **链接库**
 给 可执行文件 添加 Qt5 的 依赖：`target_link_libraries(可执行文件 Qt5::Widgets)`
+
     - target_link_libraries：因为 Qt5 不是 ros库中的，所以使用 该命令
   4. **拷贝** ：在 endif 下 加上 install 参数
 ```c
@@ -565,7 +567,18 @@ install(TARGETS 可执行文件名
 DESTINATION lib/${PROJECT_NAME}
 )
 ```
-
+###### 订阅数据 并用 Qt 显示
+1. 在 vscode .json 文件中 添加路径配置：
+  - 查询 qt5文件 路径位置 代码：
+在 终端 输入**`whereis qt5`**查询，将`lib`替换成`include`
+```json
+"includePath": [
+                "${workspaceFolder}/**",
+                "/opt/ros/humble/include/**",
+                "/usr/include/x86_64-linux-gnu/qt5/**"
+            ],
+```
+2. 
 
 
 

@@ -1,0 +1,4 @@
+[31mCMake Error at CMakeLists.txt:21 (ament_target_dependences):
+  Unknown CMake command "ament_target_dependences".
+
+[0m

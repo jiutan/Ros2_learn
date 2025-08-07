@@ -1,0 +1,22 @@
+[35m[1mConsolidate compiler generated dependencies of target status_display[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/status_display.dir/src/status_display.cpp.o[0m
+[100%] [32m[1mLinking CXX executable status_display[0m
+[100%] Built target status_display
+-- Install configuration: ""
+-- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/lib/sys_status_display/status_display
+-- Set runtime path of "/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/lib/sys_status_display/status_display" to ""
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/package_run_dependencies/sys_status_display
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/parent_prefix_path/sys_status_display
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/ament_prefix_path.sh
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/path.sh
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/path.dsv
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.bash
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.sh
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.zsh
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.dsv
+-- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/package.dsv
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/packages/sys_status_display
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/cmake/sys_status_displayConfig.cmake
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/cmake/sys_status_displayConfig-version.cmake
+-- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/package.xml

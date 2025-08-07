@@ -1,0 +1,50 @@
+[0.017s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/zyx/ros2_learn/node/chapt3/topic_ws/src/demo_cpp_topic -DCMAKE_INSTALL_PREFIX=/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic
+[0.035s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.191s] -- Found rclcpp: 16.0.12 (/opt/ros/humble/share/rclcpp/cmake)
+[0.230s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.234s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.241s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.252s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.265s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.299s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.300s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.433s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.494s] -- Found geometry_msgs: 4.9.0 (/opt/ros/humble/share/geometry_msgs/cmake)
+[0.509s] -- Found turtlesim: 1.4.2 (/opt/ros/humble/share/turtlesim/cmake)
+[0.567s] -- Found ament_lint_auto: 0.12.12 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.679s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.679s] -- Configured cppcheck include dirs: 
+[0.679s] -- Configured cppcheck exclude dirs and/or files: 
+[0.680s] -- Added test 'lint_cmake' to check CMake code style
+[0.682s] -- Added test 'uncrustify' to check C / C++ code style
+[0.682s] -- Configured uncrustify additional arguments: 
+[0.683s] -- Added test 'xmllint' to check XML markup files
+[0.685s] -- Configuring done
+[0.696s] -- Generating done
+[0.701s] -- Build files have been written to: /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic
+[0.712s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/zyx/ros2_learn/node/chapt3/topic_ws/src/demo_cpp_topic -DCMAKE_INSTALL_PREFIX=/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic
+[0.713s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic -- -j12 -l12
+[0.773s] [ 50%] [32mBuilding CXX object CMakeFiles/turtle_circle.dir/src/turtle_circle.cpp.o[0m
+[5.369s] [100%] [32m[1mLinking CXX executable turtle_circle[0m
+[5.775s] [100%] Built target turtle_circle
+[5.786s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic -- -j12 -l12
+[5.795s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic
+[5.802s] -- Install configuration: ""
+[5.802s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/lib/demo_cpp_topic/turtle_circle
+[5.803s] -- Set runtime path of "/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/lib/demo_cpp_topic/turtle_circle" to ""
+[5.803s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/package_run_dependencies/demo_cpp_topic
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/parent_prefix_path/demo_cpp_topic
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/ament_prefix_path.sh
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/ament_prefix_path.dsv
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/path.sh
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/path.dsv
+[5.804s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.bash
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.sh
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.zsh
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.dsv
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/package.dsv
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/packages/demo_cpp_topic
+[5.805s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/cmake/demo_cpp_topicConfig.cmake
+[5.806s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/cmake/demo_cpp_topicConfig-version.cmake
+[5.806s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/package.xml
+[5.808s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic

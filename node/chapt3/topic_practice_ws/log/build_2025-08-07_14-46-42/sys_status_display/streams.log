@@ -1,0 +1,69 @@
+[0.018s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/src/sys_status_display -DCMAKE_INSTALL_PREFIX=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display
+[0.379s] -- The C compiler identification is GNU 11.4.0
+[0.657s] -- The CXX compiler identification is GNU 11.4.0
+[0.680s] -- Detecting C compiler ABI info
+[0.839s] -- Detecting C compiler ABI info - done
+[0.859s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.861s] -- Detecting C compile features
+[0.862s] -- Detecting C compile features - done
+[0.869s] -- Detecting CXX compiler ABI info
+[1.032s] -- Detecting CXX compiler ABI info - done
+[1.042s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.043s] -- Detecting CXX compile features
+[1.044s] -- Detecting CXX compile features - done
+[1.047s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.280s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[1.435s] -- Found rclcpp: 16.0.14 (/opt/ros/humble/share/rclcpp/cmake)
+[1.501s] -- Found rosidl_generator_c: 3.1.7 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[1.513s] -- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[1.528s] -- Found rosidl_generator_cpp: 3.1.7 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[1.547s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.579s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.663s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[1.668s] -- Found rmw_fastrtps_cpp: 6.2.8 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[1.809s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[1.837s] -- Found FastRTPS: /opt/ros/humble/include  
+[1.875s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.884s] -- Looking for pthread.h
+[1.971s] -- Looking for pthread.h - found
+[1.971s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[2.056s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[2.058s] -- Found Threads: TRUE  
+[2.127s] -- Found status_interfaces: 0.0.0 (/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/share/status_interfaces/cmake)
+[2.160s] -- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[2.262s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[2.262s] -- Configured cppcheck include dirs: 
+[2.262s] -- Configured cppcheck exclude dirs and/or files: 
+[2.263s] -- Added test 'lint_cmake' to check CMake code style
+[2.265s] -- Added test 'uncrustify' to check C / C++ code style
+[2.265s] -- Configured uncrustify additional arguments: 
+[2.266s] -- Added test 'xmllint' to check XML markup files
+[2.268s] -- Configuring done
+[2.285s] -- Generating done
+[2.294s] -- Build files have been written to: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display
+[2.310s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display' returned '0': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/src/sys_status_display -DCMAKE_INSTALL_PREFIX=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display
+[2.312s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display -- -j12 -l12
+[2.371s] [ 50%] [32mBuilding CXX object CMakeFiles/status_display.dir/src/status_display.cpp.o[0m
+[12.450s] [100%] [32m[1mLinking CXX executable status_display[0m
+[13.859s] [100%] Built target status_display
+[13.870s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display' returned '0': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display -- -j12 -l12
+[13.872s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display
+[13.878s] -- Install configuration: ""
+[13.878s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/lib/sys_status_display/status_display
+[13.882s] -- Set runtime path of "/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/lib/sys_status_display/status_display" to ""
+[13.882s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/package_run_dependencies/sys_status_display
+[13.882s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/parent_prefix_path/sys_status_display
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/ament_prefix_path.sh
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/ament_prefix_path.dsv
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/path.sh
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/environment/path.dsv
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.bash
+[13.883s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.sh
+[13.884s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.zsh
+[13.884s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/local_setup.dsv
+[13.884s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/package.dsv
+[13.884s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/ament_index/resource_index/packages/sys_status_display
+[13.885s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/cmake/sys_status_displayConfig.cmake
+[13.885s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/cmake/sys_status_displayConfig-version.cmake
+[13.885s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/sys_status_display/share/sys_status_display/package.xml
+[13.888s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display' returned '0': AMENT_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces:/opt/ros/humble LD_LIBRARY_PATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_practice_ws/install/status_interfaces/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_practice_ws/build/sys_status_display

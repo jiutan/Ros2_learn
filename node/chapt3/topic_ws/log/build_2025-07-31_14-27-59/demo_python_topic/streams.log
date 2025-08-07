@@ -1,0 +1,23 @@
+[0.977s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/src/demo_python_topic': PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/demo_python_topic build --build-base /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/build install --record /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/install.log --single-version-externally-managed install_data
+[1.275s] running egg_info
+[1.276s] writing ../../build/demo_python_topic/demo_python_topic.egg-info/PKG-INFO
+[1.276s] writing dependency_links to ../../build/demo_python_topic/demo_python_topic.egg-info/dependency_links.txt
+[1.276s] writing entry points to ../../build/demo_python_topic/demo_python_topic.egg-info/entry_points.txt
+[1.277s] writing requirements to ../../build/demo_python_topic/demo_python_topic.egg-info/requires.txt
+[1.277s] writing top-level names to ../../build/demo_python_topic/demo_python_topic.egg-info/top_level.txt
+[1.279s] reading manifest file '../../build/demo_python_topic/demo_python_topic.egg-info/SOURCES.txt'
+[1.279s] adding license file 'LICENSE'
+[1.280s] writing manifest file '../../build/demo_python_topic/demo_python_topic.egg-info/SOURCES.txt'
+[1.280s] running build
+[1.280s] running build_py
+[1.281s] running install
+[1.281s] running install_lib
+[1.282s] running install_data
+[1.282s] running install_egg_info
+[1.284s] removing '/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/python3.10/site-packages/demo_python_topic-0.0.0-py3.10.egg-info' (and everything under it)
+[1.285s] Copying ../../build/demo_python_topic/demo_python_topic.egg-info to /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/python3.10/site-packages/demo_python_topic-0.0.0-py3.10.egg-info
+[1.286s] running install_scripts
+[1.311s] Installing novel_pub_node script to /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/demo_python_topic
+[1.314s] Installing novel_sub_node script to /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/demo_python_topic
+[1.314s] writing list of installed files to '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/install.log'
+[1.352s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/src/demo_python_topic' returned '0': PYTHONPATH=/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/demo_python_topic build --build-base /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/build install --record /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_python_topic/install.log --single-version-externally-managed install_data

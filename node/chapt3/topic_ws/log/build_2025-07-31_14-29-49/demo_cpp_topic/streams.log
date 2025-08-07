@@ -1,0 +1,28 @@
+[0.022s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic:/opt/ros/humble /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic -- -j12 -l12
+[0.086s] [35m[1mConsolidate compiler generated dependencies of target turtle_control[0m
+[0.102s] [ 50%] Built target turtle_circle
+[0.112s] [ 75%] [32mBuilding CXX object CMakeFiles/turtle_control.dir/src/turtle_control.cpp.o[0m
+[10.233s] [100%] [32m[1mLinking CXX executable turtle_control[0m
+[10.778s] [100%] Built target turtle_control
+[10.790s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic:/opt/ros/humble /usr/bin/cmake --build /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic -- -j12 -l12
+[10.800s] Invoking command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic:/opt/ros/humble /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic
+[10.808s] -- Install configuration: ""
+[10.808s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/lib/demo_cpp_topic/turtle_circle
+[10.809s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/lib/demo_cpp_topic/turtle_control
+[10.813s] -- Set runtime path of "/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/lib/demo_cpp_topic/turtle_control" to ""
+[10.813s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/package_run_dependencies/demo_cpp_topic
+[10.813s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/parent_prefix_path/demo_cpp_topic
+[10.813s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/ament_prefix_path.sh
+[10.813s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/ament_prefix_path.dsv
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/path.sh
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/environment/path.dsv
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.bash
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.sh
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.zsh
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/local_setup.dsv
+[10.814s] -- Installing: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/package.dsv
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/ament_index/resource_index/packages/demo_cpp_topic
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/cmake/demo_cpp_topicConfig.cmake
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/cmake/demo_cpp_topicConfig-version.cmake
+[10.814s] -- Up-to-date: /home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_cpp_topic/share/demo_cpp_topic/package.xml
+[10.816s] Invoked command in '/home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/zyx/ros2_learn/node/chapt3/topic_ws/install/demo_python_topic:/opt/ros/humble /usr/bin/cmake --install /home/zyx/ros2_learn/node/chapt3/topic_ws/build/demo_cpp_topic
