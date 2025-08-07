@@ -579,6 +579,110 @@ DESTINATION lib/${PROJECT_NAME}
             ],
 ```
 2. 
+## 八、服务通信 与 参数通信
+1. ROS2 的 四种 通信方式：
+  - ==话题通信==【基础】：**单向通信**，发布者 发给 订阅者
+  - ==服务通信==（两个话题通信构成）：**双向通信**，有接有发
+  - ==参数通信==（多个服务通信构成）：用于 **修改参数**
+  - ==动作通信==： 
+### 1. 服务通信（service）
+1. 三要素： 
+- 服务 通信名字
+- 服务端 与 客户端
+- 服务 消息接口
+#### 服务通信 的 ROS2 命令
+1. 查看 正在运行的ros2 下的 服务模块 以及 接口类型：`ros2 service list -t`
+  - 服务名字：/ + 名字
+  - 服务的 消息接口/服务类型： [ 里面的 内容]
+2. 查看 具体的 服务模块：`ros2 interface show 服务消息接口`
+  - “---” 上面部分：是 **请求部分**。要使用该接口 时 ，需创建 的 请求内容。
+  - “---” 下面部分：是 **返回部分**。使用 该接口后，该接口 将 返回 的值。
+3. 服务通信 的 请求（终端命令行）：
+- 语法：`ros2 service call 服务名字 服务消息接口 "{请求部分的数据(用逗号隔开)}"`
+如：`ros2 service call /spawn turtlesim/srv/Spawn "{x:1,y:1}"`
+4. 服务通信 的 请求==（rqt可视化界面）==：
+- 语法：**`rqt`**，会生成 一个界面。
+- 选择 `Plugins -> Services -> Service Caller`
+- 可以在 Request区，更改信息 -> 点击 Call 发送
+### 2. 参数通信（shell 命令）【基于 服务的】
+1. ==**帮助** 查看 参数==：`ros2 param --help` 
+
+2. ==参数==：被视为 **结点的设置**，是 *基于 服务通信* 实现的
+
+3. 查看 当前运行程序 与参数 相关的 服务列表：
+语法：`ros2 service list -t | grep parameter`
+
+4. 使用【shell命令】 来 设置 参数：（设置 单个 参数）
+- 查看 ==参数 列表==：`ros2 param list`
+- 查看 ==某参数 的具体 内容==-：`ros2 param describe /消息名称 参数名称`
+  - name：参数名称
+  - Type：参数类型
+  - Description：参数 描述
+  - Constraints：参数 约束。（step：补偿）  
+- ==**获取** 当前 参数的值==：`ros2 param get /节点名字 参数名称`
+- ==**修改** 目标 参数 的 值==：`ros2 param set /节点名字 参数名称 设置参数值`
+  - 返回：`set parameter successful` 
+
+5. 使用【配置文件】来 设置 参数：（设置 多个 参数）
+- 将 ==参数 **导出** 成 yaml文件== ：`ros2 param dump /节点名字 > 参数文件.yaml`
+- ==**查看  yaml 文件**==：`cat 参数文件.yaml`
+- == 修改 yaml文件== ：用于 改变 节点的 参数值
+- ==**使用** yaml文件 来 修改参数==：
+`ros2 run 功能包 节点名字 --ros-args --params-file 参数文件.yaml`
+
+6. 使用【 rqt 可视化界面】来 设置 参数：
+1) 打开 可视化界面：`rqt`
+2) 打开 `Plugins -> Configuration -> Dynamic Reconfigure` 打开 参数 列表
+3) 使用  该 参数界面 来 **动态的** 调整参数
+### 3. 【Python服务通信项目】 实现 人脸检测
+#### （1）自定义 服务接口
+1. 目标：使用python创建客户端与服务端，完成 请求和响应。使用 视觉识别，实现 人脸检测 服务。
+2. 大致内容：
+- 创建 服务消息接口 与 服务端，用于 接收图片 并 进行识别
+- 创建 客户端 节点，请求 服务，并 显示 识别结果
+3. 需求：创建 人脸检测 服务，提供图像，返回 人脸 数量位置 信息
+4. 难点分析：
+  - 人脸怎么识别？			 	       使用`face_recognition库`
+  - 图片数据和结果 怎么 传递？		 使用 服务通信
+  - 没有合适的 消息接口 怎么办？ 	自定义服务消息接口（请求部分 为 图像；返回的是 位置信息）
+
+5. 创建 自定义消息接口功能包 时 ==需要的 依赖==：
+  - ==**创建自定义消息接口 必备**的依赖：**`rosidl_default_generator`**== 
+  - ros2 图像消息接口 依赖：`sensor_msgs`
+6. 删除 include 和 src，并在 功能包 下：
+- 添加 **`srv` 服务接口文件夹**，并在下面 创建 **服务接口文件`文件名.srv`**
+7. ==如何 自定义服务接口==：【	中间用 三个"-"隔开：---	】
+- **请求**部分：使用 ros2中的 **图像定义 消息接口 `sensor_msgs/Image`**
+- **响应/返回**部分：
+```py
+# 请求 部分
+sensor_msgs/Image image		# 图像消息，原始图像
+---
+# 返回 部分
+int16 number 		# 人脸个数
+float32 use_time	# 识别 消耗的时间
+int32[] top			# 使用数组（可能不止一个图像），来存储 人脸在图像中的位置
+int32[] right
+int32[] bottom
+int32[] left
+```
+8. 在 CMakeLists.txt 中 添加 消息接口：
+```cmake
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/FaceDetector.srv"		# 消息接口 的 路径
+  DEPENDENCIES sensor_msgs		# 消息接口功能 的 依赖文件
+)
+```
+9. 修改 功能包 消息文件 `package.xml`：**声明 该功能包 是 消息接口功能包**
+在<depend>前，输入：
+```xml
+ <member_of_group> rosidl_interface_packages </member_of_group>
+```
+10. 构建 工作空间：`colcon build`；后，添加 环境：`source install/setup.bash`
+11. 查看 定义好的 自定义消息接口：`ros2 interface show 功能包名/srv/文件名`
+#### （2）人脸检测 的 实现
+1. 人脸检测 库的 安装：`pip3 install face_recognition -i https://pypi.tuna.tsinghua.edu.cn/simple`
+2. 
 
 
 
