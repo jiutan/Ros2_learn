@@ -682,7 +682,24 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 11. 查看 定义好的 自定义消息接口：`ros2 interface show 功能包名/srv/文件名`
 #### （2）人脸检测 的 实现
 1. 人脸检测 库的 安装：`pip3 install face_recognition -i https://pypi.tuna.tsinghua.edu.cn/simple`
-2. 
+2. 创建 python功能包
+3. 下载图片 并 ==在`setup.py`中 增加 新增的图片 地址：
+```py
+data_files=[
+       ('share/' + package_name+'/resource', ['resource/图片路径']),
+// 构建时，将图片拷贝到：/install/package_name/share/package_name/resource
+    ],
+```
+4.  写 程序：`learn_face_detect.py`
+#### （3）人脸检测 服务端 的 实现
+1. 图片 的 两种格式：
+  - ROS 图片格式：		消息接口sensor_msgs
+  - OPENCV 图片格式
+2. 两种 格式之间 需要进行 转换：通过**CV BRIDGE**进行 转换
+##### 服务实现 的 步骤：
+1. 创建 服务类：在类中，创建 服务端；使用 回调函数，当接收到客户端request时，调用函数。
+2. 回调函数：调用`face_recognition`进行识别
+3. 将 识别结果 进行处理：合成 Response 并 进行返回
 
 
 
