@@ -691,16 +691,30 @@ data_files=[
     ],
 ```
 4.  写 程序：`learn_face_detect.py`
-#### （3）人脸检测 服务端 的 实现
+#### （3）人脸检测 服务端 的 实现	【face_detect_service.py】
 1. 图片 的 两种格式：
   - ROS 图片格式：		消息接口sensor_msgs
   - OPENCV 图片格式
 2. 两种 格式之间 需要进行 转换：通过**CV BRIDGE**进行 转换
+```c
+库： from cv_bridge import CvBridge
+````
 ##### 服务实现 的 步骤：
-1. 创建 服务类：在类中，创建 服务端；使用 回调函数，当接收到客户端request时，调用函数。
-2. 回调函数：调用`face_recognition`进行识别
-3. 将 识别结果 进行处理：合成 Response 并 进行返回
-
+1. 创建 服务类：在类中，创建 服务端`create_service()`；使用 回调函数，当接收到客户端request时，调用函数。
+2. 回调函数：接收到消息后，调用`face_recognition`函数
+3. 在 回调函数中 将 识别结果 进行处理，后 **合成 Response 并 返回 给 客户端**
+#### （4）人脸检测 客户端 的 实现
+1. 图片 的 两种格式：
+  - ROS 图片格式：		消息接口sensor_msgs
+  - OPENCV 图片格式
+2. 两种 格式之间 需要进行 转换：通过**CV BRIDGE**进行 转换
+```c
+库： from cv_bridge import CvBridge
+````
+##### 客户端 实现步骤：
+1. 定义 服务类，并在 服务类 中 创建客户端``
+2. 构造 Request，给 服务端 发送请求
+3. 处理 服务端 返回的 Response，并 绘制 人脸识别框 
 
 
 # ROS2常见的错误
@@ -765,14 +779,19 @@ data_files=[
 ```c
 	ros2 pkg preflex <功能包名>		// 查看 功能包的路径
 ```
-## ros2 interface list：查看 功能包内 有什么文件
-## ros2 interface show：查看 功能包 内 文件的 具体内容
+## ros2 interface : 消息接口相关
+### ros2 interface list：查看 功能包内 有什么文件
+### ros2 interface show：查看 功能包 内 文件的 具体内容
 1. 功能 ： 查看 功能包的 具体内容。`ros2 功能包 show 具体文件`
 
 如： 查看 example_interfaces/msg/String 的内容
 ```c
 ros2 interface show example_interfaces/msg/String
 ```
+## ros2 service：消息 服务 相关
+### ros2 service list -t : 查看 当前 运行的 服务
+### ros2 service call 服务名字 服务接口 "消息内容"： 给 指定的 服务 发送 消息
+
 
 # 编程基础
 ## 一、面向对象编程

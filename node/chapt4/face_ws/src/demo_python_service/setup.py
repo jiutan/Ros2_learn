@@ -10,7 +10,9 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name+'/resource', ['resource/图片路径']),
+        # 配置 图片路径
+        ('share/' + package_name+'/resource', ['resource/default.jpg','resource/test1.jpg']),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -21,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'learn_face_detect = demo_python_service/learn_face_detect:main',
+            'learn_face_detect = demo_python_service.learn_face_detect:main',
+            'face_detect_service = demo_python_service.face_detect_service:main',
         ],
     },
 )
