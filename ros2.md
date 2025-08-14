@@ -578,7 +578,8 @@ DESTINATION lib/${PROJECT_NAME}
                 "/usr/include/x86_64-linux-gnu/qt5/**"
             ],
 ```
-2. 
+
+
 ## 八、服务通信 与 参数通信
 1. ROS2 的 四种 通信方式：
   - ==话题通信==【基础】：**单向通信**，发布者 发给 订阅者
@@ -715,6 +716,65 @@ data_files=[
 1. 定义 服务类，并在 服务类 中 创建客户端``
 2. 构造 Request，给 服务端 发送请求
 3. 处理 服务端 返回的 Response，并 绘制 人脸识别框 
+
+### 3. 【C++服务通信项目】 实现 巡逻海龟
+1. 需求： 让小海龟 在 海龟模拟器 中 随即游走 并且进行 巡逻
+2. 分析：
+- 怎么 改成 动态的目标点 接收	  服务端 接收 客户端发出的 目标点坐标，服务端指挥小海龟
+- 用什么 通信接口？ 		       自定义接口
+- 怎么实现 随机游走 ？			客户端 产生随机点，请求 巡逻服务
+#### 创建 自定义接口
+1. request请求值：
+  - 目标点坐标：float x,y
+2. response返回值：（**大写表示 常数**）
+  - 服务端处理结果：int8 result 里，存放 成功/失败
+  - 是否能走通。定义常量：SUCCESS、FAIL
+3. 在 CMakelist中，添加 消息接口
+```c
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/Patrol.srv"
+  DEPENDENCIES sensor_msgs
+)
+```
+4. 构建 工作空间
+5. 查看 自定义接口：`ros2 interface show 消息功能包/srv/消息接口文件`
+#### C++ 服务端 实现
+1. 创建功能包
+2. 
+3. 
+4. 查看 运行的服务 列表：`ros2 service list -t`
+5. 检验：使用 rqt 图形界面。`rqt -> plugins -> service -> service call`
+  - Servicce : 从列表中 选出 自定义的消息接口(/patrol)
+
+## 十、建模
+### 10.1 机器人建模 结构
+1. 结构：
+![image-20250814175235648](/home/zyx/snap/typora/102/.config/Typora/typora-user-images/image-20250814175235648.png)
+2. 常用的 方针平台：
+- Gazebo click
+- weballs
+- Unity3D
+- Matlab/Simulink
+### 10.2 机器人建模 文件格式 【URDF】
+1. URDF 使用 XML（可扩展标记语言）来 描述 机器人的 几何结构、传感器和执行器等 信息。
+2. 文件语法：
+```c
+// 这是xml的版本
+<?xml version="1.0"?>
+// robot 是 一个 标签
+<robot name="first_robot">
+	<!--- 这是 XML语言 的 注释	--->
+	<link name="base_link"></link>		// link 为 robot的子标签
+</robot>
+// 创建一个，名字为 first_robot的机器人，内部有 base_link部件
+```
+3. 创建 URDF 功能包：（不需要 加入依赖）
+4. 在 功能包 下，创建 urdf文件夹，用来存放 urdf文件
+#### URDF 语法
+#### URDF 工具
+##### urdf_to_graphviz
+1. 该 工具 的 作用： 通过 URDF文件 生成 **pdf 与 gv格式 的文件**
+2. 语法：==**`urdf_to_graphviz urdf文件.urdf`**== 
 
 
 # ROS2常见的错误

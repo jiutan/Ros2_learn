@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             'learn_face_detect = demo_python_service.learn_face_detect:main',
             'face_detect_service = demo_python_service.face_detect_service:main',
+            'face_detect_client = demo_python_service.face_detect_client:main',
         ],
     },
 )
