@@ -738,13 +738,18 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 ```
 4. 构建 工作空间
 5. 查看 自定义接口：`ros2 interface show 消息功能包/srv/消息接口文件`
-#### C++ 服务端 实现
+#### C++ 服务端 实现（turtle_control.cpp）
 1. 创建功能包
 2. 
 3. 
 4. 查看 运行的服务 列表：`ros2 service list -t`
 5. 检验：使用 rqt 图形界面。`rqt -> plugins -> service -> service call`
   - Servicce : 从列表中 选出 自定义的消息接口(/patrol)
+
+#### C++客户端实现
+实现步骤：
+1. 创建 客户端 和 定时器
+2. 定时 产生 目标点 并 请求 服务端巡逻
 
 ## 十、建模
 ### 10.1 机器人建模 结构
