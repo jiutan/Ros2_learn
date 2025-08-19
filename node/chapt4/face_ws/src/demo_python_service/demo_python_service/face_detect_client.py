@@ -12,6 +12,11 @@ import os
 from cv_bridge import CvBridge
 import time
 
+# 导入 SetParameters服务
+from rcl_interfaces.srv import SetParameters
+# 导入 SetParameters内的 Parameter消息接口
+from rcl_interfaces.msg import Parameter,ParameterValue,ParameterType   # ParameterType 是 参数类型的规定
+
 # 定义 客户端 类
 class FaceDetectClient(Node):
     def __init__(self):
@@ -26,6 +31,54 @@ class FaceDetectClient(Node):
         self.client = self.create_client(FaceDetector,'face_detector')
         # 创建 图像 对象属性
         self.image = cv2.imread(self.image_path)  # 读取 图像
+
+    '''
+    函数 功能： 调用服务，修改 参数值
+    '''
+    def call_set_parameters(self,parameters):
+        # 1. 创建 参数更新 客户端
+        update_param_client = self.create_client(SetParameters,'/face_detect_service/set_parameters')  # 名字为 列表中的
+        # 2. 等待 参苏更新 服务端 上线
+        while update_param_client.wait_for_service(timeout_sec=1.0) is False:
+            self.get_logger().info('等待 参数更新 服务端上线')
+        # 3. 创建 request
+        request = SetParameters.Request()
+        request.parameters = parameters         # 设置 请求的 参数信息 Parameter。可以在 interface中查看
+        # 4. 调用 服务端 更新 参数（异步调用），返回给 future
+        future = update_param_client.call_async(request)
+        # 5. 等待 参数服务器 返回 响应结果
+        rclpy.spin_until_future_complete(self,future)                       # 等待 服务端 返回 响应   
+        # 6. 创建 response 为 响应结果
+        response = future.result()
+        return response                         # 到上一级 处理 response
+
+    '''
+    函数功能 ： 更新 检测的模型
+        参数： model = 默认值
+    函数实现：根据 传入的model，构造Parameters，然后再调用 call_set_parameters 来 更新 服务端参数
+    
+    parameter消息 参数：
+        name 
+        parameterValue(复合参数，嵌套)： 需 创建一个parameterValue 再对其 进行赋值。【其中，parameterValue 也是个 消息接口，需导入库】
+
+    '''
+    # 消息内容 可 通过 ros2 interface show rcl_interfaces/srv/SetParameters 查看
+    def update_detect_node(self,model='hog'):
+        # 1. 创建 Parameter消息接口 参数对象
+        param = Parameter()                     # 调用 Parameter() 消息接口
+        param.name = 'model'                    # 设置 name 参数
+        # 2. 创建 param_value消息接口 对象，并且对 param_value 的 参数 进行赋值
+        param_value = ParameterValue()          # 调用 parameterValue() 消息接口
+        param_value.string_value = model
+        param_value.type = ParameterType.PARAMETER_STRING       # 系统 固定的 参数类型
+        # 3. 将 value 参数 设置为 param_value消息接口
+        param.value = param_value
+        # 4. 请求 更新参数
+        response = self.call_set_parameters([param])            # 函数 参数 为 一个 数组
+        # 其 返回值 是一个 SetParametersResult[]消息接口 数组，所以 需要 遍历 来 获取 内容
+        for result in response.results:
+            if result.successful:
+                self.get_logger().info(f'设置参数结果：{result.successful}与{result.reason}')
 
 
     # 定义 发送请求 函数
@@ -57,7 +110,7 @@ class FaceDetectClient(Node):
             response = result_future.result()                                          # 获取 结果，返回给 response 响应 
             self.get_logger().info(f('接收到 响应，共检测到{response.number}张人脸，耗时{response.use_time}s'))
             # 6. 对 响应 进行 处理
-            self.show_response(response)
+            # self.show_response(response) 不用参数，则取消 注释
         
         future.add_done_callback(result_callback)
 
@@ -85,7 +138,13 @@ def main():
 
     node = FaceDetectClient()  # 创建 客户端 节点
 
+    node.update_detect_node('hog')
+
     node.send_request()         # 调用 send_request
+
+    node.update_detect_node('cnn')
+
+    node.send_request()  
 
     rclpy.spin(node)  # 保持 节点 运行
 

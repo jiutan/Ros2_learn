@@ -751,6 +751,72 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 1. 创建 客户端 和 定时器
 2. 定时 产生 目标点 并 请求 服务端巡逻
 
+### 4.【Python 参数 通信项目】 人脸检测：将 采样次数 和 检测模型 参数化
+#### 如何 参数化？
+1. 把 **人脸检测参数 改为 ROS2参数 实现方法**：
+- declare_parameter：用于 声明参数。
+  - 第一个参数：参数 的 名称
+  - 第二个参数：参数 的 默认值
+- get_parameter(参数).value ：用于 获取 参数的值。.value 用于 获取其 真实值并赋给对应属性
+  - 第一个参数：参数 的 名称
+```py
+def __init__(self):
+	...
+	# ROS2 参数化 声明
+	self.declare_parameter('number_of_times_to_upsample',1)
+	self.declare_parameter('model',"hog")
+	# ROS2 获取 参数 / 设置 参数
+	self.number_of_times_to_upsample = self.get_patameter('number_of_times_to_upsample').value
+	self.mode = self.get_parameter('mode').value
+```
+2. 参数 相关 代码：
+  1) ros2 param list ：查看 参数 列表
+  2) ros2 param set /节点名字 参数名字 参数值：设置 对应的 参数 
+  3) ros2 param get 节点名字 参数名字：获取 对应的 参数
+3. 在 ==启动时，可以 **直接 设置参数**==
+语法：`ros2 run 功能包名 可执行文件节点名 --ros-args -p 参数名字:=参数值`
+  - `--ros-args`：要 添加 ros 参数
+  - `-p`：一个参数
+#### 订阅 参数更新
+1. 原理：相当于 **服务通信**，在 服务端 **回调函数 中 更新 参数**
+  - 查看服务列表：会出现`/节点/set_parameters `
+  - 服务`set_parameters`作用 ：设置 参数值
+2. 返回值：rcl_interfaces/srv/SetParametersResult
+3. 语法：
+```py
+# 导入 SetParametersResult消息接口 库
+from rcl_interfaces.msg import SetParametersResult
+
+def __init__(self):
+	# 添加 设置参数 的 回调函数：当 参数更新时，ROS2会自动调用 该回调函数
+	self.add_on_set_parameters_callback(self.parameter_callback)
+
+# 设置 回调函数：在回调函数 中 遍历 参数，并 赋值 对应参数
+ def parameters_callback(self,parameters):
+        for parameter in parameters:
+		    self.get_logger().info(f'参数{parameter.name}设置为{parameter.value}')
+            if parameter.name == 'number_of_times_to_upsample':
+                # 设置参数
+                self.number_of_times_to_upsample = parameter.value  
+            if parameter.name == 'model':
+                self.model == parameter.value
+        # 需要 返回：参数设置 是 成功or失败
+        return SetParametersResult(successful=True)     # 成功
+```
+#### 【服务 实践】修改 其他节点 的参数（使用 客户端）
+1. 基本原理：在 客户端 中 通过**请求服务 通信**来 完成 参数设置。
+2. 消息接口：
+`ros2 interface show rcl_interfaces/srv/SetParameters`
+3. 服务与消息接口 库
+- 导入 SetParameters服务
+`from rcl_interfaces.srv import SetParameters`
+- SetParameters为 复合消息接口，里面还有个 Parameter消息接口：
+`from rcl_interfaces.msg import Parameter`
+4. 
+
+
+
+
 ## 十、建模
 ### 10.1 机器人建模 结构
 1. 结构：
@@ -856,6 +922,11 @@ ros2 interface show example_interfaces/msg/String
 ## ros2 service：消息 服务 相关
 ### ros2 service list -t : 查看 当前 运行的 服务
 ### ros2 service call 服务名字 服务接口 "消息内容"： 给 指定的 服务 发送 消息
+
+## ros2 param : 参数 服务 相关
+### ros2 param list ：查看 参数 列表
+### ros2 param set /节点名字 参数名字：	 设置 对应的 参数
+### ros2 param get /节点名字 参数名字：	获取 对应的 参数
 
 
 # 编程基础

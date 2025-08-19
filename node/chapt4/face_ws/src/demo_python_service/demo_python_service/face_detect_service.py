@@ -15,6 +15,9 @@ from cv_bridge import CvBridge
 # 导入 时间库
 import time
 
+# 导入 SetParametersResult消息接口 库
+from rcl_interfaces.msg import SetParametersResult
+
 # 创建 人脸识别类
 class FaceDetectService(Node):          # 继承 Node类
     def __init__(self):
@@ -24,13 +27,47 @@ class FaceDetectService(Node):          # 继承 Node类
         # 实例化 cvbridge 对象，用于图像转换
         self.bridge = CvBridge()
         # 检测人脸 的 两个参数,并将 两个参数 作为 类的属性
+        '''
+        非 参数化：
         self.number_of_times_to_upsample = 1   # 上采样次数
         self.model = 'hog'                      # 识别人脸的模型
+        '''
+
+        '''
+        参数化：
+        '''
+        # ROS2 参数化 声明
+        self.declare_parameter('number_of_times_to_upsample',1)
+        self.declare_parameter('model','hog')
+        # ROS2 获取 参数 / 设置 参数
+        self.number_of_times_to_upsample = self.get_parameter('number_of_times_to_upsample').value
+        self.model = self.get_parameter('model').value
+        
         # 创建 类属性：图像的默认路径。使用 os功能 进行 路径拼接
         self.default_image_path = os.path.join(get_package_share_directory('demo_python_service'),'resource/default.jpg')
         # 若 服务启动，则 打印出来
         self.get_logger().info(f'人脸识别服务 已启动！')
+        # 添加 设置参数 的 回调函数：当 参数更新时，ROS2会自动调用 该回调函数
+        self.add_on_set_parameters_callback(self.parameters_callback)
 
+        # 设置 自身节点参数 的 方法
+        # self.set_parameters([rclpy.parameter('mode',rclpy.parameter.Type.STRING,'cnn')])
+
+    '''
+    定义： 设置参数 的 回调函数
+        parameters 为 待更新的 参数列表
+    '''
+    def parameters_callback(self,parameters):
+        for parameter in parameters:
+            self.get_logger().info(f'参数{parameter.name}设置为{parameter.value}')
+            if parameter.name == 'number_of_times_to_upsample':
+                self.number_of_times_to_upsample = parameter.value  # 设置参数
+            if parameter.name == 'model':
+                self.model == parameter.value
+        # 需要 返回：参数设置 是 成功or失败
+        return SetParametersResult(successful=True)     # 成功
+
+        
 
     # 定义 创建服务的 回调函数
     # 参数：
