@@ -10,6 +10,14 @@ using namespace std::chrono_literals;  // 使用 chrono 命名空间下的 字�
 // 使用 ctime 产生 随机数
 #include<ctime>
 
+// 导入 消息接口库：为了 修改 其他节点 的 参数
+#include"rcl_interfaces/msg/parameter.hpp"
+// 添加 消息接口 下 的 嵌套消息接口
+#include"rcl_interfaces/msg/parameter_value.hpp"
+#include"rcl_interfaces/msg/parameter_type.hpp"
+#include"rcl_interfaces/srv/set_parameters.hpp"
+using SetP = rcl_interfaces::srv::SetParameters;
+
 // 创建 客户端 类
 class PatrolClientNode:public rclcpp::Node
 {
@@ -81,16 +89,82 @@ public:
                     }
             });
         });
-        
+    }
+
+    /**
+     * 创建 客户端，发送 request请求 对象，返回 response结果
+     *   * 形参列表：请求对象 的 数据，需 外部传入 进来。所以 其 形参 为 请求部分的数据
+     */
+    SetP::Response::SharedPtr call_set_parameter(const rcl_interfaces::msg::Parameter &param){
+        // 1. 创建 客户端对象
+        auto param_client = this->create_client<SetP>("/turtle_control/set_parameters");   // 通信 名字
+        // 2. 检测 服务是否上线
+        while (!param_client->wait_for_service(1s))
+        {
+            if(!rclcpp::ok()){
+                RCLCPP_ERROR(this->get_logger(),"等待服务上线过程中，rclcpp 挂了，退出程序");
+                return nullptr;             // 返回 空指针，并 退出 
+            }
+            RCLCPP_INFO(this->get_logger(),"等待服务上线中......");
+        }
+        // 3. 构造 request请求 的 智能指针 对象
+        auto request = std::make_shared<SetP::Request>();
+        // request中 是有 参数数组Parameter[]:  需将 请求的数据param 添加至 参数数组中 
+        request -> parameters.push_back(param);                 // C++数组中，使用 push_back 来给 数组 添加数据
+
+        // 4. 发送请求【同步修改】：发送异步请求，等待请求结果；收到结果后，存入response 并 将其返回
+        auto future = param_client -> async_send_request(request);                  // 异步 发送 request请求
+        // spin_until_future_complete()方法:
+        //      参数：1.节点共享指针get_node_base_interface         2. 发送请求对象
+        rclcpp::spin_until_future_complete(this->get_node_base_interface(),future);  
+        // 5. 发送请求后，获取 响应结果 放入 response对象中
+        auto response = future.get();
+        // 6. 返回 结果 指针
+        return response;
+    }
+
+    /**
+     * 【模板】
+     * 更新参数K 函数
+     * 函数作用：外部 可以 调用该函数 来 更新 某个参数值
+     */
+    void update_server_param_k(double k){
+        // 1. 创建 一个 参数服务 的对象（包含：  name 与 value 两个 参数）
+        auto param = rcl_interfaces::msg::Parameter();
+        // 2. 给 服务对象 name 赋值
+        //      string name 与  ParameterValue value（复合消息接口）
+        param.name = "k";
+        // 3. 创建 value参数对象 ，其为ParameterValue消息接口 类型 
+        auto param_value = rcl_interfaces::msg::ParameterValue(); 
+        //  分别给 ParameterValue对象 的 参数 赋值
+        // 优点：使用 消息接口 标准化
+        param_value.type = rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE;    // 类型为 double消息接口 类型 
+        // 由于 是 double类型，可 直接赋值 double_value
+        param_value.double_value = k;
+        // 4. 将 服务对象 的 value 赋值 param_value
+        param.value = param_value;
+        // 5. 请求 更新/设置参数 并 将 返回的 结果 进行 处理
+        auto response = this->call_set_parameter(param);
+        // 判断 返回结果
+        if(response == NULL)        // response 为 指针
+        {
+            RCLCPP_INFO(this->get_logger(),"参数 更新 失败！");
+            return;
+        }
+        // 将返回的结果 进行 遍历处理
+        // 其 response内容为 ：SetParametersResult[]数组，其 对象为 results
+        //      内部参数为：bool successful 与  string reason
+        for(auto result : response -> results){
+            if(result.successful == false){
+                // successful   是否成功
+                // reason       失败的原因（注意使用：c_str() 转换为 C语言下的 字符串类型）
+                RCLCPP_INFO(this->get_logger(),"参数 更新 失败！其原因为:%s",result.reason.c_str()); 
+            }else{
+                 RCLCPP_INFO(this->get_logger(),"参数 更新 成功！"); 
+            }
+        }
     }
 };
-
-
-
-
-
-
-
 
 int main(int argc,char *argv[]){
 
@@ -99,6 +173,9 @@ int main(int argc,char *argv[]){
 
     // 创建 节点
     auto node = std::make_shared<PatrolClientNode>("Patrol_client");
+
+    // 调用 更新参数函数
+    node -> update_server_param_k(4.0);
 
     // 运行节点
     rclcpp::spin(node);
