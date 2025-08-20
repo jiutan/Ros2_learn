@@ -812,9 +812,90 @@ def __init__(self):
 `from rcl_interfaces.srv import SetParameters`
 - SetParameters为 复合消息接口，里面还有个 Parameter消息接口：
 `from rcl_interfaces.msg import Parameter`
-4. 
 
+### 5.【C++ 参数通信 项目】小海龟
+#### （1） C++参数 声明 与 设置：
+1) 参数：小海龟 的 比例系数k\_ 与 最大速度max\_speed\_
+2) 语法：
+```c
+// 在 类中 
+class TurtleController:public rclcpp::Node{
+public:
+	// 在 构造函数中 声明 与 初始化
+	TurtleController():Node("turtle_controller"){
+	
+		// 声明 参数
+		this -> declare_parameter("k",1.0);
+		this -> declare-parameter("max_speed",1.0);
+		
+		// 获取 参数 初始值
+		this -> get_parameter("k",k_)
+		this -> get_parameter("max_speed",max_speed_)
+	
+	}
+}
+```
+3) 函数：
+- `declare_parameter( "参数名" , 参数的默认值 )`
+  - 作用： 声明 有 该 参数 可以设置
+  - 该 函数 在 Node类中
 
+- `get_parameter( "参数名" ，用于接收参数值的变量 )`
+  - 作用：获取 当前 的 参数值，并将其 放入 变量中
+  - 该 函数 在 Node类中
+  - 参数：
+    - ==用于接收参数值的变量：传入 成员变量 （引用/指针）中==
+4) 在 rqt 中 修改 参数：
+`rqt -> Plugins -> Configuration -> dynamic Reconfig`
+#### （2）C++ 接收 参数 事件
+1. 原因：由于 使用 rqt或其余方式，更改 参数值 **只会更改 ros2 内部的 参数值**，不会改 成员变量中的值。
+2. 目的：把 ROS2 内部的参数值 **拷贝到** 类成员变量 中。
+3. 方法：
+1) 使用 服务通信：==**`/节点名/set_parameters`**来 设置 参数==
+  - 当 设置 参数后，系统 会 自动调用 回调函数
+2) 其 **返回值类型 为：`rcl_interfaces/srv/SetParametersResult`**
+3) 在 服务端 声明并调用 **回调函数**：
+- ==回调函数 在 每一次 设置参数 时 被 调用==
+  - 在 **回调函数** 中，对 **`request`**中的 数据 进行处理。
+  -  返回 一个 **`response`**
+4. 代码 步骤：
+1) 导入 消息接口库：
+`#include"rcl_interfaces/msg/set_parameters_result.hpp"`
+2) 使用 **using** 简化 下 消息接口
+`using SetParametersResult = rcl_interfaces::msg::SetParametersResult;`
+3) 在 类 private  成员变量中，使用 共享指针 声明/创建 参数回调函数变量
+`OnSetParametersCallbackHandle::SharedPtr parameter_callback_handle_;`
+4) 在 构造函数 中；在 声明与获取参数 后 ，对 变量 进行 初始化
+`parameter_callback_handle_ = this->add_on_set_parameters_callback(回调函数);`
+  - 使用的 方法：add_on_set_parameters_callback(回调函数)
+    - 回调函数：使用 lamda 表达式 
+5) 编写 回调函数：
+```cpp
+// 对 参数回调 变量 进行 初始化
+        // 编写 回调函数
+parameter_callback_handle_ = this->add_on_set_parameters_callback(
+    [&](const std::vector<rclcpp::Parameter> &parameters) -> rcl_interfaces::msg::SetParametersResult {
+        // 创建 result 对象，用来 存储 获取参数 的 结果
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        // 使用的 是 vector数组：遍历 数组
+        for (const auto & parameter : parameters){
+            // 如果 成功遍历，打印 当前 处理的 参数名字
+            // 因为 使用的是 C格式 下的 打印，字符串 需转换下 格式：c_str()
+            RCLCPP_INFO(this->get_logger(),"更新参数的值: %s = %f",parameter.get_name().c_str(),parameter.as_double());
+            // 通过 参数 的 名字 来 对 成员变量 进行赋值
+            if(parameter.get_name() == "k"){
+                // 获取 参数 中的 double类型数据
+                this->k_ = parameter.as_double();
+            }
+            if(parameter.get_name()=="max_speed"){
+                this->max_speed_ = parameter.as_double();
+            }
+        }
+});
+```
+6) 还可以 通过 文件内的 代码，来 改变 自身的值【不常用】:（在 获取参数 下）
+`this->set_parameter(rclcpp::Parameter("参数名",待设置的参数值));`
 
 
 ## 十、建模
