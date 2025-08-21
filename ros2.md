@@ -1,4 +1,4 @@
-# ROS2学习
+# 安装篇
 ## 一、ROS2安装与rosdep环境的配置
 ### 1.使用小鱼 ROS2 一件安装
 1. 下载脚本并执行脚本（脚本运行完会自动删除）
@@ -19,8 +19,6 @@
 2. 选择ROS相关： 3 配置rosdep
 3. 等待安装
 4. 检验配置是否成功：在终端输入`rosdepc update`
-
-
 ## 二、环境变量的妙用
 ### 1.配置环境变量
 注意：每次**打开新的工程 或 编译工程时**，都要进行环境变量的配置与检查
@@ -83,8 +81,8 @@
     ros2 node info <正在运行的节点路径>     // 查看指定节点的详细信息
 ```
 
-
-## 四、节点node学习
+# 基础学习篇
+## 一、节点node学习
 ### 1.基础内容
 1. **python**的node初始化
 ```python
@@ -170,7 +168,7 @@ target_link_libraries(ros2_cpp_node ${rclcpp_LIBRARIES})    # 库文件连接
   - 级别：（1）info：普通级别；（2）warn：警告级别
   - 时间辍：从1970年至今的 秒数
 
-## 五、功能包 pkg   【组织节点的工具】（在 功能包 中编写节点）
+## 二、功能包 pkg   【组织节点的工具】（在 功能包 中编写节点）
 ### Python语法：
 1. 创建功能包 package：
 ```py
@@ -280,7 +278,7 @@ install(
 	ros2 run <功能包名> <可执行文件名>
 ```
 
-## 六、工作空间 Workspace
+## 三、工作空间 Workspace
 1. Workspace：一个完整的机器人项目，往往由多个不同的 功能模块组成，所以就需要 多个功能包进行组合。（workspace 只是一个 概念，其实 ==本质 就是一个**文件夹**==）
 
 ### 1. 创建 工作空间
@@ -304,7 +302,7 @@ install(
 	// 在 <buildtool_depend> 前 加入
 	<depend>demo_cpp_pkg</depend>
 ```
-## 七、话题topic 通信学习
+## 四、话题topic 通信学习
 ### 1. 介绍：
 #### 关键点
 1. **发布者**：消息内容 的 创建者
@@ -578,9 +576,7 @@ DESTINATION lib/${PROJECT_NAME}
                 "/usr/include/x86_64-linux-gnu/qt5/**"
             ],
 ```
-
-
-## 八、服务通信 与 参数通信
+## 五、服务通信 与 参数通信
 1. ROS2 的 四种 通信方式：
   - ==话题通信==【基础】：**单向通信**，发布者 发给 订阅者
   - ==服务通信==（两个话题通信构成）：**双向通信**，有接有发
@@ -1002,8 +998,8 @@ void update_server_param_k(double k){
 // 调用 更新参数函数
     node -> update_server_param_k(4.0);
 ```
-
-## 九、 使用 launch 来 启动脚本
+# 工具篇
+## 一、Launch工具：使用 launch 来 启动脚本
 1. 作用：可以==在 脚本中 **一次启动 多个 节点**==
 2. launch工具：ROS2中 用于 启动和管理 ROS2 节点与进程的工具
 3. launch文件 的 格式：**python**，XML，YAML 三种
@@ -1078,7 +1074,6 @@ def generate_launch_description():
 		action_declare_参数对象名字
     ])
 ```
-
 ### 2. launch 文件路径 的 配置
 1) 【C++中】MakeLists.txt的编写：
 ```txt
@@ -1228,10 +1223,11 @@ def generate_launch_description():
 3. 使用 launch时，设置条件：
 `ros2 launch 功能包名 名.launch.py 参数别名:=False/True`
 
-## 十、常用 工具
+## 二、TF工具：坐标变换 工具
 
 
-## 十一、建模
+# 建模与仿真（实战）篇
+## 一、建模
 ### 10.1 机器人建模 结构
 1. 结构：
 ![image-20250814175235648](/home/zyx/snap/typora/102/.config/Typora/typora-user-images/image-20250814175235648.png)
