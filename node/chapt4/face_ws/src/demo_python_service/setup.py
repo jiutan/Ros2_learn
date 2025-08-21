@@ -1,5 +1,7 @@
 from setuptools import find_packages, setup
 
+from glob import glob
+
 package_name = 'demo_python_service'
 
 setup(
@@ -11,7 +13,8 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         # 配置 图片路径
-        ('share/' + package_name+'/resource', ['resource/default.jpg','resource/test1.jpg']),
+        ('share/' + package_name +'/resource', ['resource/default.jpg','resource/test1.jpg']),
+        ('share/' + package_name + "/launch", glob('launch/*.launch.py') )
 
     ],
     install_requires=['setuptools'],

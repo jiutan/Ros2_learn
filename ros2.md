@@ -1003,12 +1003,235 @@ void update_server_param_k(double k){
     node -> update_server_param_k(4.0);
 ```
 
-### 6. 使用 launch 来 启动脚本
+## 九、 使用 launch 来 启动脚本
+1. 作用：可以==在 脚本中 **一次启动 多个 节点**==
+2. launch工具：ROS2中 用于 启动和管理 ROS2 节点与进程的工具
+3. launch文件 的 格式：**python**，XML，YAML 三种
+4. ==使用 debug 查错 launch：**`ros2 launch 出错的命令 --debug`** 
+### 1. launc 文件的编写：【python 格式（常用）】
+#### （1）使用 launch 启动 多个节点
+1) 在 功能包文件夹 下 新建 `launch文件夹`，并创建`文件名.launch.py`的文件
+2) 调用 库文件：
+```py
+import launch
+import launch_ros
+```
+3) 程序语法：
+- 定义函数：**`def generate_launch_description():`（注意：【函数名不能更改】）**
+- 返回值：为**launch的描述：`launch.LaunchDescription([actions数组])`
+```py
+# 1. 创建 actions 对象,并 传入参数
+    # 一次 运行 3个 节点/动作
+    action_node_turtlesim_node =  launch_ros.actions.Node(
+    # 传入的参数为：
+        # (1) 功能包 的名字
+        package = 'turtlesim',   
+        # (2) 可执行文件 的 名字        
+        executable= 'turtlesim_node',             # 小海龟 节点
+        # (3) 日志 输出 的 目的地  
+        output = 'screen',                        # screen：输出 至 屏幕 
+    )
+    action_node_patrol_clien =  launch_ros.actions.Node(
+        package = 'demo_cpp_service',      
+        executable= 'patrol_client',              # 巡逻 客户端 节点
+        output = 'log',                           # log：输出 至 日志文家          
+    )
+    action_node_turtle_control =  launch_ros.actions.Node(
+            package = 'demo_cpp_service',        
+            executable= 'turtle_control',         # 小海龟 控制 服务端 节点
+            output = 'both',                      # both：两者 都输出     
+        )
+    # 2. 返回 LaunchDescription 对象，其 参数为一个 数组
+    return launch.LaunchDescription([
+        # 数组 内容为：actions动作
+        action_node_turtlesim_node ,                    # 启动 小海龟
+        action_node_patrol_clien ,                      # 启动 巡逻 客户端
+        action_node_turtle_control                      # 启动 控制 服务端
+    ])
+````
+#### （2）使用 launch 传递 参数
+1. ros2 方法 来 传递参数：
+`ros2 run turtlesim turtlesim_node --ros-args -p 参数:=参数值`
+2. 使用 launch文件 手动 修改 参数：
+  1) 声明 一个 `launch.actions` 对象 ：
+- 方法：`launch.actions.DeclareLaunchArgument(参数)`
+  - 参数：（1）给参数起一个别名 	（2）默认值:default_value = '值' （必须是 字符串格式）
+```py
+def generate_launch_description():
+	action_declare_参数对象名字= launch.actions.DeclareLaunchArgument('参数别名',default_value='默认值')
+```
+  2) 把 launch 的参数 手动传递 给 某个节点
+- `launch.substitutions.LaunchConfiguration('参数别名')` 
+  - 函数 作用：把 launch中的 参数 转换成 节点中用的参数
+  - **参数别名 作用**：在 命令行 中**使用 该别名 可对 节点中参数 进行修改**
+```py
+	# 在某一节点中：
+	action_node_节点名 = launch_ros.actions.Node(
+		# 将 launch中的参数 转化为 节点内的参数
+		parameters =
+[{'参数名':launch.substitutions.LaunchConfiguration('参数别名')}],
+	)
+```
+  3) 在 return 中 加入`launch.actions` 对象：
+```py
+	return launch.LaunchDescription([
+		action_declare_参数对象名字
+    ])
+```
+
+### 2. launch 文件路径 的 配置
+1) 【C++中】MakeLists.txt的编写：
+```txt
+# 将 launch 添加 至 install路径中
+install(DIRECTORY launch
+DESTINATION share/${PROJECT_NAME}
+)
+```
+2) 【Python中】setup.py 的 编写
+  - glob函数：可以利用 **匹配符** 自动生成列表 放入 share目录中
+```py
+# 1. 导入 glob库 中 的 glob类
+from glob import glob
+
+# 2. 在 data_files 中：导入 一个 glob函数： 生成一个列表
+data_files=[
+	('share/' + package_name + "/launch", glob('launch/*.launch.py'))
+]
+```
+### 3. 运行 launch 文件 的 终端命令
+1. 使用 ros2 命令：**`ros2 launch 功能包名 文件名.launch.py`**
+2. 在 文件夹中 直接使用： 需 提前 `source 文件夹下的setup.bash`
+3. **设置 参数 的 命令：`ros2 launch 功能包名 文件名.launch.py 参数别名:=值`**
+
+### 4. Launch 使用 进阶
+1. Launch 的 三大组件：
+- ==动作==：除了是 节点外，还可以是 打印、终端指令、甚至是 另一个launch文件
+- ==替换==：使用 launch的参数 **替换** 节点中的参数值
+- ==条件==：利用 条件可以决定 哪些动作启动，哪些不启动。（** 相当于if **）
+#### Launch 动作 组件：
+1. 使用 其他 launch文件：
+1) 导入  库：
+- `launch.launch_description_sources`
+- `get_package_share_directory`
+  - 功能：使用 该库 中 `get_package_share_directory`函数 来获取 其他launch文件的路径
+```py
+# launch 库
+import launch.launch_description_sources
+# 通过 功能包名字 获取 share 目录
+from ament_index_python.packages import get_package_share_directory
+```
+2) 程序：
+- 用 数组 组成 路径：
+**`get_package_share_directory('功能包名'),'/launch','.launch.py'`**
+- `get_package_share_directory('功能包名')`：寻找 功能包 路径
+- `launch.actions.IncludeLaunchDescription`：寻找 launch文件
+- `launch.launch_description_sources.PythonLaunchDescriptionSource`：拼接路径
+```py
+def generate_launch_description():
+	# 1. 创建 路径数组 
+	multisim_launch_path = [get_package_share_directory('turtlesim'),'/launch','/multisim.launch.py']
+	# 2. 创建 action对象：通过 launch文件路径 寻找 launch文件
+	action_include_launch = launch.actions.IncludeLaunchDescription(
+launch.launch_description_sources.PythonLaunchDescriptionSource(multisim_launch_path)
+	# 3. 返回 动作action（多个 动作，用 ， 隔开）
+	return launch.LaunchDescription([
+		action_include_launch
+	])
+    )
+```
+2. 执行 终端命令行：
+- `launch.actions.ExecuteProcess(cmd=['命令字段1','命令字段2',...])`
+```py
+def generate_launch_description():
+    # 创建 action 对象：执行 命令行语句
+    action_topic_list = launch.actions.ExecuteProcess(
+        cmd=['ros2','topic','list']   		# 执行ros2 topic list
+    )
+    return launch.LaunchDescription([
+		action_topic_list
+	])
+```
+3. 输出 日志：
+- `launch.actions.LogInfo(msg=str(对象))`：打印 对象 内容
+```py
+def generate_launch_description():
+	# 创建 action 对象：打印 内容
+	action_log_info = launch.actions.LogInfo(msg=str(multisim_launch_path))
+	
+	return launch.LaunchDescription([
+		action_log_info
+	])
+```
+4. 使用 定时器动作：
+- `launch.actions.TimerAction(period=时间,actions=[action对象])`
+- 作用：在 第{时间}s后，执行 动作action
+5. 组织 多个动作 放在一起，==**按顺序**依次实现==
+- `launch.actions.GroupAction([动作1,动作2,...])` 
+- 作用：**依次执行 动作/定时器动作**
+```py
+def generate_launch_description():
+	# 创建 action对象：组织动作
+    action_group = launch.actions.GroupAction([
+    # 组织 多个动作 的 先后顺序
+
+    # 使用 定时器 间隔 执行 动作
+    # 第2s后，启动 action_include_launch
+    launch.actions.TimerAction(period=2.0,actions=[action_include_launch]),     
+    # 第4s后，启动 action_topic_list
+    launch.actions.TimerAction(period=4.0,actions=[action_topic_list]) 
+])
+	return launch.LaunchDescription([
+        # 这两个 动作 会 一起 执行
+        action_log_info,
+        action_group
+    ])
+```
+#### Launch 条件 组件：
+1. 需要 通过 **参数 传递**来实现 条件 功能：
+1) 声明 参数 对象：
+- 该参数：为bool类型，True or False
+```py
+action_declare_参数 = launch.actions.DeclareLaunchArgument('参数别名',default_value='True/False')
+```
+2) 创建 **参数传递** 对象，使用 该对象 与 条件 即可实现：
+```py
+参数传递对象 = launch.substitutions.LaunchConfiguration('参数别名')
+```
+3) 在 **具体方法**中，创建 条件 组件 参数
+- `launch.conditions.IfCondition(参数传递对象)`
+- 相当于：if (参数传递对象){ 执行 行动 }
+```py
+	action_对象 = launch.actions.动作(
+		# 创建 条件 组件对象
+		condition = launch.conditions.IfCondition(参数传递对象),
+		其他 组件
+	) 
+```
+2. 举例 程序：
+```py
+def generate_launch_description():
+	# 1. 创建 参数声明 对象，声明 launch参数，以 后面调用
+	action_declare_startup_rqt = launch.actions.DeclareLaunchArgument('startup_rqt',default_value='False')
+	# 2. 创建一个 参数传递 对象，使用该对象 加上 条件 即可控制
+    startup_rqt = launch.substitutions.LaunchConfiguration('startup_rqt')
+    # 3. 在具体 行动中 加入 参数 条件
+     action_topic_list = launch.actions.ExecuteProcess(
+        # if startup_rqt:   
+        #    run rqt
+        condition = launch.conditions.IfCondition(startup_rqt),
+        cmd=['rqt']                         
+    )
+    return launch.LaunchDescription([
+        action_declare_startup_rqt
+    ])
+```
+3. 使用 launch时，设置条件：
+`ros2 launch 功能包名 名.launch.py 参数别名:=False/True`
+
+## 十、常用 工具
 
 
-
-
-## 十、建模
+## 十一、建模
 ### 10.1 机器人建模 结构
 1. 结构：
 ![image-20250814175235648](/home/zyx/snap/typora/102/.config/Typora/typora-user-images/image-20250814175235648.png)
