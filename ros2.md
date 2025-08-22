@@ -1224,7 +1224,32 @@ def generate_launch_description():
 `ros2 launch 功能包名 名.launch.py 参数别名:=False/True`
 
 ## 二、TF工具：坐标变换 工具
+### 1. 通过 命令行 使用 TF工具：
+1. 变换：**
+`ros2 run tf2_ros static_transform_publisher --参数1 参数值 --参数2 参数值`**
+参数1：（浮点型 数据）【缺一不可】
+	- x: X 轴 距离
+	- y: Y 轴 距离
+	- z: Z 轴 距离
+	- roll: X 轴 旋转(翻滚角)
+	- pitch: Y 轴 旋转（俯仰角)
+	- yaw: Z 轴 旋转（偏航角）
+参数2：父坐标系 与 子坐标系 名字 绑定
+	- frame-id 			指定 父坐标系 名字
+	- child-frame-id 	指定 子坐标系 名字
+2. 查询：**`ros2 run tf2_rostf2_echo 父坐标系 子坐标系`**
+作用：查询 子坐标系 到 父坐标系 之间的关系
+3. 例如：
+发布 从 base_link 到  base_laser 坐标系 之间的 变换：
+```c
+ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0.0 --z 0.2 --roll 0.0 --pitch 0.0 --yaw 0.0 --frame-id base_link --child-frame-id base_laser
+```
+### 2. 3D可视化 旋转 工具：3d-rotation-converter
+1. 安装：`sudo apt install ros-humble-mrpt2 -y`
+2. 使用：`3d-rotation-convert`
 
+### 3. 可视化 TF 坐标 树结构
+1. 命令：**`ros2 run tf2_tools view_frames`**
 
 # 建模与仿真（实战）篇
 ## 一、建模
