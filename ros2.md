@@ -1499,7 +1499,7 @@ def main():
 ### 4.【C++】机器人 在 地图上 坐标 与 目标点 坐标 移动
 #### 需求分析：
 1. 背景：
-  控制 机器人 到达 目标点。知道 地图坐标 到机器人坐标之间的关系，与 地图坐标到 目标点 组坐标之间的关系。
+    控制 机器人 到达 目标点。知道 地图坐标 到机器人坐标之间的关系，与 地图坐标到 目标点 组坐标之间的关系。
 2. 参数：
 - map -> base_link：XYZ（2.0 , 3.0 , 0.0） 	RPY（0 ，0， 30）
 - map -> target_point：XYZ（5.0，3.0, 0.0）     RPY（0  , 0 , 60）
@@ -1687,9 +1687,154 @@ catch(const std::exception& e)			// 捕获的异常 放入 e 中
 ```
 6. 整体程序：
 ```cpp
+#include"rclcpp/rclcpp.hpp"
+#include"geometry_msgs/msg/transform_stamped.hpp"
+#include"tf2/LinearMath/Quaternion.hpp"                  // 提供 四元数 tf2::Quaternion类
+#include"tf2_geometry_msgs/tf2_geometry_msgs.hpp"        // 消息类型 转换函数： 将 内容 转换成 消息接口
+#include"tf2_ros/transform_listener.h"                   // 坐标 监听器 类
+#include "tf2_ros/buffer.h"                              // 提供 buffer 类 的 库
 
+#include "tf2/utils.h"                                   // 提供了 四元数据 转成 欧拉角 的 库
+
+#include "chrono"
+using namespace std::chrono_literals;
+
+class TFListener:public rclcpp::Node
+{
+private:
+
+    // 声明 监听器 对象
+    std::shared_ptr<tf2_ros::TransformListener> listener_;
+
+    // 声明 buffer 对象
+    std::shared_ptr<tf2_ros::Buffer> buffer_;
+
+    // 声明 定时器 对象
+    rclcpp::TimerBase::SharedPtr timer_; 
+
+public:
+    // 构造函数 编写:对 声明的 对象 进行 实例化
+    TFListener():Node("tf_listener")
+    {   
+        // 实例化 buffer 对象：用来 存储TF数据，在 回调函数中 查询
+        buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());         // 需要 时间的记录
+        // 实例化 listener，用来 获取/订阅 tf2_ros话题 的 数据，并将 其 放入 buffer 中
+        this -> listener_ = std::make_shared<tf2_ros::TransformListener>(*buffer_,this);      // 使用 指针
+        // 使用 定时器 不停 地 调用 函数 获取 TF坐标
+        timer_ = this->create_wall_timer(1s,std::bind(&TFListener::get_transform,this)); // 使用 函数包装器 写 定时器
+        
+    }
+
+    /**
+     * 编写 获取 TF坐标 的方法
+     * 方法：
+     *      1. 
+     *      2. 
+     */
+    void get_transform(){
+        /**
+         * 需要 捕获 异常： 使用 C++中的 try-catch 语句，进行 异常捕获
+         */
+        // 1. 在 buffer 里 查询 坐标关系
+        try
+        {
+            // 查询 坐标关系：超时 1s 中 
+            const auto transfer = buffer_ -> lookupTransform(
+                "base_link",
+                "target_point",
+                this->get_clock()->now(),
+                rclcpp::Duration::from_seconds(1.0f)        
+            ); 
+            // 2. 若 成功查询，则 执行 获取 查询transfer结果 存入 translation与rotation
+            auto translation = transfer.transform.translation;
+            auto rotation = transfer.transform.rotation;            // rotation中 包含 四元数
+
+            // 3. 将 rotation中的 四元数 转化成 欧拉角
+            // (1) 先 创建 Y P R 变量，用于 存入 Y P R 的 欧拉角
+            double y,p,r;
+            // (2) 使用tf2::getEulerYPR(rotation,y,p,r)方法：将 YPRW四元数 转化成 欧拉角,放入 y,p,r 变量中。
+            tf2::getEulerYPR(rotation,y,p,r);                       // 参数 为 引用，直接更改 y,p,r
+            
+            // 4. 打印 translation与rotation 数据
+            RCLCPP_INFO(get_logger(),"平移：%f,%f,%f",translation.x,translation.y,translation.z);
+            RCLCPP_INFO(get_logger(),"旋转:%f,%f,%f",r,p,y);
+        }
+        catch(const std::exception& e)
+        {
+            // 若 查询失败，则 执行 报错
+            RCLCPP_WARN(get_logger(),"%s",e.what());
+        }
+        
+        
+    }
+};
+
+int main(int argc,char *argv[]){
+    rclcpp::init(argc,argv);
+    auto node = std::make_shared<TFListener>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
 ```
 
+## 三、rqt 可视化 工具
+### 1. 普通 rqt 可视化 工具
+1. 作用：可以查看 **参数、消息接口 等**
+
+### 2. rqt-tf-tree工具：可视化 查看 TF坐标
+1. 安装：`sudo apt install ros-$ROS_DISTRO-rqt-tf-tree -y`
+- $ROS_DISTRO：当前版本 的 万能语句
+2. **更新** 配置文件：`rm -rf ~/.config/ros.org/rqt_gui.ini`
+3. 运行：`rqt`
+4. 使用`tf-tree`工具：`Plugins -> Visualization -> TF-Tree工具`
+5. 运行 TF转换 节点，点击 刷新 ，即可：在 **该工具中 查看 TF坐标 关系**
+
+## 四、数据可视化 工具 RViz
+### 1. 概念：
+1. Rviz 工具：可以将 TF坐标 在**3D 界面中 展现出来**
+2. 窗口：
+- 左侧窗口：用于 显示 数据
+
+
+### 2. 使用：
+1. 使用命令：`rviz2`调出 工具
+2. 点击 **`Add`按钮，来 添加 想要查看的 数据**
+3. ==使用插件：**`By display type -> TF`**==
+4. 设置 默认模板：`File -> Save Config`
+
+### 3. 界面 功能：
+#### Global Options
+1. `Fixed Frame`：设置 坐标系 原点（将 指定的 坐标系 设置为 原点）
+#### Grid
+1. `Plane Cell Count`： 图像总体为 `n*n`的方格
+2. `Cell Size`：表示 每一个小格为 n米长/宽
+#### TF工具
+1. `Marker Scale`：用于 放缩 坐标轴 图像
+2. `Frames`：查看 坐标系 框架
+
+### 4. 保存文件
+1. 方法：`File -> Save Config As`，起名字 保存
+2. 文件：`.rviz`后缀
+
+### 5. 打开文件
+1. Shell 方法：`rviz2 -d ../rviz文件名.rviz`
+
+## 五、数据记录工具 ros2 bag
+1. 原因：记录数据，用于 分析与多次实验
+
+### 1. 记录 操作：
+1. ==**`ros2 bag record /话题名字`**==
+2. 记录后的文件，放在 当前目录下，名字为：`rosbag2_xxx` 
+3. 原理：复制 消息
+
+### 2. 查询操作：
+1. ==查看 记录的文件名：**`ls ros*`**==
+2. **查看 详细操作：`cat rosbag2_xxx/metadata.yaml`**
+
+### 3. 复现 操作：
+1. 复现：==**`ros2 bag play rosbag2_xxx/`**==
+2. 原理：复现 通信消息
 
 
 # 建模与仿真（实战）篇
