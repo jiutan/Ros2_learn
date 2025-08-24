@@ -1283,10 +1283,10 @@ ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0.0 --z 0.2 --roll 0.0 -
 - 手：**机械臂**
 - 眼：**照相机**
 2. 背景：
-  生活中，有 相机 与 目标 的 相对坐标（x,y,z与R,P,Y）；有 机械臂 与 相机 的 相对坐标；
-求：==目标 在 机械臂坐标 下的 关系 x,y,z与R,P,Y==
+    生活中，有 相机 与 目标 的 相对坐标（x,y,z与R,P,Y）；有 机械臂 与 相机 的 相对坐标；
+    求：==目标 在 机械臂坐标 下的 关系 x,y,z与R,P,Y==
 3. 现实中，困难点：
-  **目标 是 实时动态的**，非静态。使用 静态坐标 发布器 是 不合适的。
+    **目标 是 实时动态的**，非静态。使用 静态坐标 发布器 是 不合适的。
 #### 静态 TF 发布：
 1. 原理：**发布`/tf_static`话题**
 2. ==发布工具：`StaticTransformBroadcaster(self)`函数== 
@@ -1496,6 +1496,200 @@ def main():
     rclpy.spin(node)
     rclpy.shutdown()
 ```
+### 4.【C++】机器人 在 地图上 坐标 与 目标点 坐标 移动
+#### 需求分析：
+1. 背景：
+  控制 机器人 到达 目标点。知道 地图坐标 到机器人坐标之间的关系，与 地图坐标到 目标点 组坐标之间的关系。
+2. 参数：
+- map -> base_link：XYZ（2.0 , 3.0 , 0.0） 	RPY（0 ，0， 30）
+- map -> target_point：XYZ（5.0，3.0, 0.0）     RPY（0  , 0 , 60）
+3. 坐标变换：
+- map -> base_link：**坐标 不断在变换**，使用 动态坐标
+- map -> target_point：坐标不变，使用 静态坐标
+#### C++ 静态 发布 TF
+1. 原理：发布 **`/tf_static`话题**
+- 创建 广播器：(需要使用 this 指针，类似于 node)
+`broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this)`
+- 消息类型：`geometry_msgs::msg::TransformStamped transform`
+2. 需要的 依赖：
+- `rclcpp`： ROS2 必需 依赖的库
+- `tf2_ros`：用于 静态坐标 广播器
+- `geometry_msgs`：消息接口 依赖库
+- `tf2_geometry_msgs`：将 tf 转化成 消息接口 的 依赖
+3. 头文件：
+```cpp
+#include"rclcpp/rclcpp.hpp"
+#include"geometry_msgs/msg/transform_stamped.hpp"
+// 提供 四元数 tf2::Quaternion类
+#include"tf2/LinearMath/Quaternion.hpp"              
+// 消息类型 转换函数： 将 内容 转换成 消息接口
+#include"tf2_geometry_msgs/tf2_geometry_msgs.hpp"        
+// 静态坐标 广播器 类
+#include"tf2_ros/static_transform_broadcaster.h"         
+```
+4. 程序：
+```cpp
+class StaticTFBroadercast:public rclcpp::Node
+{
+private:
+    // 在 私有成员内部 声明 对象
+    // 声明 静态广播器 智能指针 对象
+    std::shared_ptr<tf2_ros::StaticTransformBroadcaster> broadcaster_;
+public:
+    // 构造函数 编写
+    StaticTFBroadercast():Node("static_tf_broadcaster")
+    {
+        // 在 构造函数中 ，对 声明的 对象 进行 实例化
+        this->broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);      // this 为 当前节点，需要 使用节点在类内部 创建 发布者
+        // 进行 发布
+        this -> publish_tf();
+        
+    }
+
+    /**
+     * 编写 发布 成员方法
+     * 方法：
+     *      1. 需要 定义一个 消息接口
+     *      2. 对 消息接口 赋值
+     */
+    void publish_tf(){
+        // 1. 定义 消息接口对象
+        geometry_msgs::msg::TransformStamped transform;
+        // 2. 对 消息接口 赋值  [具体格式 需 查看 消息接口定义]
+        transform.header.stamp = this->get_clock()->now();      // 使用 当前时间 作为 时间辍
+        transform.header.frame_id = "map";
+        transform.child_frame_id = "target_point";
+        transform.transform.translation.x = 5.0;
+        transform.transform.translation.y = 3.0;
+        transform.transform.translation.z = 0.0;
+        
+        // 对 消息接口 的 旋转部分 进行赋值
+        //（1）定义一个 四元数：使用 tf2::Quarternion类
+        tf2::Quaternion q;
+        //（2）设置 四元数 的 内容： q.setRPY(x的弧度,y的弧度,z的弧度) 
+        q.setRPY(0.0,0.0,60*M_PI/180.0);                        // 弧度值 = 角度值 * M_PI / 180
+        //（3）赋值
+        transform.transform.rotation = tf2::toMsg(q);           // tf2::toMsg(q) 可以将 四元数q 转换成 tranform下的rotation
+        
+        // 3. 使用 广播器 发布 transform 对象,发送出去
+        this->broadcaster_->sendTransform(transform);
+    }
+};
+int main(int argc,char *argv[]){
+    rclcpp::init(argc,argv);
+    auto node = std::make_shared<StaticTFBroadercast>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+#### C++ 动态 TF 发布
+1. 原理：**不停 发布** /tf 话题
+- 创建 广播器：(需要使用 this 指针，类似于 node)
+`tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this)`
+- 消息类型：`geometry_msgs::msg::TransformStamped transform`
+2. 依赖库：
+- `tf2_ros/transform_broadcaster.h`
+
+3. 程序：
+```cpp
+#include"rclcpp/rclcpp.hpp"
+#include"geometry_msgs/msg/transform_stamped.hpp"
+#include"tf2/LinearMath/Quaternion.hpp"                  // 提供 四元数 tf2::Quaternion类
+#include"tf2_geometry_msgs/tf2_geometry_msgs.hpp"        // 消息类型 转换函数： 将 内容 转换成 消息接口
+#include"tf2_ros/transform_broadcaster.h"                // 坐标 广播器 类
+#include "chrono"
+using namespace std::chrono_literals;
+class TFBroadercast:public rclcpp::Node
+{
+private:
+    // 在 私有成员内部 声明 对象
+    // 声明 静态广播器 智能指针 对象
+    std::shared_ptr<tf2_ros::TransformBroadcaster> broadcaster_;
+    // 声明 定时器 对象
+    rclcpp::TimerBase::SharedPtr timer_; 
+public:
+    // 构造函数 编写
+    TFBroadercast():Node("tf_broadcaster")
+    {
+        // 在 构造函数中 ，对 声明的 对象 进行 实例化
+        this->broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);      // this 为 当前节点，需要 使用节点在类内部 创建 发布者
+        // 使用 定时器 不停 地 发布
+        timer_ = this->create_wall_timer(100ms,std::bind(&TFBroadercast::publish_tf,this)); // 使用 函数包装器 写 定时器
+    }
+    /**
+     * 编写 发布 成员方法
+     * 方法：
+     *      1. 需要 定义一个 消息接口
+     *      2. 对 消息接口 赋值
+     */
+    void publish_tf(){
+        // 1. 定义 消息接口对象
+        geometry_msgs::msg::TransformStamped transform;
+        // 2. 对 消息接口 赋值  [具体格式 需 查看 消息接口定义]
+        transform.header.stamp = this->get_clock()->now();      // 使用 当前时间 作为 时间辍
+        transform.header.frame_id = "map";
+        transform.child_frame_id = "base_link";
+        transform.transform.translation.x = 2.0;
+        transform.transform.translation.y = 3.0;
+        transform.transform.translation.z = 0.0;
+       
+        // 对 消息接口 的 旋转部分 进行赋值
+        //（1）定义一个 四元数：使用 tf2::Quarternion类
+        tf2::Quaternion q;
+        //（2）设置 四元数 的 内容： q.setRPY(x的弧度,y的弧度,z的弧度) 
+        q.setRPY(0.0,0.0,30 * M_PI/180.0);                        // 弧度值 = 角度值 * M_PI / 180
+        //（3）赋值
+        transform.transform.rotation = tf2::toMsg(q);           // tf2::toMsg(q) 可以将 四元数q 转换成 tranform下的rotation
+        // 3. 使用 广播器 发布 transform 对象,发送出去
+        this->broadcaster_->sendTransform(transform);
+    }
+};
+int main(int argc,char *argv[]){
+    rclcpp::init(argc,argv);
+    auto node = std::make_shared<TFBroadercast>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+#### C++ 查询 TF 的 关系
+1. 目的：查询 base_link 到 target_point 之间的 TF关系
+2. 原理：订阅话题**/tf，/tf_static**来收集 所有坐标系 关系，并进行计算。
+- 实例化 buffer 对象：用于 **存储 监听到的 所有坐标关系**，放到 `buffer_`里面
+`buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());`
+-  实例化 监听器：用来 **获取/订阅 话题数据**，放入 buffer 中
+`listener_ = std::make_shared<tf2_ros::TransformListener>(*buffer_,this)`
+-  利用 buffer 中的 `lookupTransform`方法 来 查询 坐标TF关系
+3. 函数：
+==**`lookupTransform("父坐标系","子坐标系",查询时间点,超时时间段);`**==
+- 参数：
+  - 查询时间点：查询 当前时间的TF关系。用`this->get_clock()->now()`
+  - 超时时间段：超过该时间，则查询失败。超过1s，用`rclcpp::Duration::from_seconds(1.0f)`
+- 返回值：
+  - ==返回**TF 相对坐标值** 
+4. 依赖库：
+- `tf2_ros/transform_listener.h`：坐标 监听器 类，订阅 /tf 的 消息
+- `tf2_ros/buffer.h`：buffer类库，用于 存储 订阅的消息
+- `tf2/utils.h`：提供 四元数据 转成 欧拉角 的 方法
+
+5. ==C++中 `try - catch` 语句==：用于 **异常 的 捕获**
+```cpp
+try
+{
+	// 查询 语句
+}
+catch(const std::exception& e)			// 捕获的异常 放入 e 中
+{
+	// 若 查询失败，则 执行 报错
+    RCLCPP_WARN(get_logger(),"%s",e.what());
+}
+```
+6. 整体程序：
+```cpp
+
+```
+
 
 
 # 建模与仿真（实战）篇

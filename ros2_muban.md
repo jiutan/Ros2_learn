@@ -1,8 +1,82 @@
 # ROS2 学习过程中 遇到的模板
 # 以后 可以 直接 复制粘贴 使用
 ## C++
-### 一、 CMakeLists
-### 二、 参数 服务
+### 一、C++程序
+#### 1. 头文件：
+```cpp
+// 时间 库
+#include "chrono"
+// 命名空间：在 代码中 直接可以使用 数字s/ms 表示 几秒/毫秒
+using namespace std::chrono_literals;
+```
+#### 2. 创建 类：
+```cpp
+class 类名:public rclcpp::Node		// 继承 Node类
+{
+private:		// 在 私有成员内部 声明 智能指针 对象 作为 类成员
+	// 声明 模板类 智能指针对象
+	std::shared_ptr<模板类> 类成员对象_;
+	
+	// 声明 定时器 对象
+    rclcpp::TimerBase::SharedPtr timer_; 
+public:			
+	// 编写构造函数，并且给 该节点 起个名字
+	类名():Node("节点名字")
+	{
+		// 在构造函数中 实例化 声明的对象
+		this -> 类成员对象_ = std::make_shared<类模板>(参数)
+		
+		// 运行 功能/成员函数方法
+		this -> 成员函数();
+		
+		// 使用 定时器：一段时间，调用 回调函数【使用 函数包装器】
+		timer_ = this -> create_wall_timer(几ms,std::bind(&类名::回调函数,this));
+	}
+	
+	// 定义 成员函数方法：实现 功能
+	void 成员函数(){
+		
+	}
+	
+	// 定义 回调函数
+	void 回调函数(){
+	
+	}
+
+};
+```
+#### 3. 主函数：
+```cpp
+int main(int argc,char *argv[]){
+    rclcpp::init(argc,argv);
+
+    auto node = std::make_shared<上面定义的类>();
+
+    rclcpp::spin(node);
+
+    rclcpp::shutdown();
+	
+	return 0;
+}
+```
+
+### 二、CMakeLists
+```txt
+''' 在 find_package 下面 '''
+# 添加 可执行文件
+add_executable(可执行文件名 src/节点文件名.cpp)
+
+# 给 可执行文件 添加 依赖项
+ament_target_dependencies(可执行文件名 依赖项)
+
+'''	在 ament_package() 上面'''
+# 安装 路径
+install(TARGETS 可执行文件名
+DESTINATION lib/${PROJECT_NAME}
+)
+```
+
+### 三、 参数 服务
 #### 1. 更新 其他节点 参数K 的 模板
 ```c
 void update_server_param_k(double k){
@@ -46,7 +120,8 @@ void update_server_param_k(double k){
 ### 1. 节点名.py 文件
 ```py
 class 节点类名(Node):					# 继承 Node节点类
-	# 构造函数 
+	# 构造函数 // 声明 定时器 对象
+    rclcpp::TimerBase::SharedPtr timer_; 
 	def __init__(self):
 		# 1. 给 节点 起名字
 		super().__init__('节点名字')	
