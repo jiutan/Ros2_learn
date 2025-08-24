@@ -1224,17 +1224,18 @@ def generate_launch_description():
 `ros2 launch 功能包名 名.launch.py 参数别名:=False/True`
 
 ## 二、TF工具：坐标变换 工具
-### 1. 通过 命令行 使用 TF工具：
+### 1. TF 工具
+#### 1.1 通过 命令行 使用 TF工具：
 1. 变换：**
-`ros2 run tf2_ros static_transform_publisher --参数1 参数值 --参数2 参数值`**
-参数1：（浮点型 数据）【缺一不可】
+	`ros2 run tf2_ros static_transform_publisher --参数1 参数值 --参数2 参数值`**
+	参数1：（浮点型 数据）【缺一不可】
 	- x: X 轴 距离
 	- y: Y 轴 距离
 	- z: Z 轴 距离
 	- roll: X 轴 旋转(翻滚角)
 	- pitch: Y 轴 旋转（俯仰角)
 	- yaw: Z 轴 旋转（偏航角）
-参数2：父坐标系 与 子坐标系 名字 绑定
+	参数2：父坐标系 与 子坐标系 名字 绑定
 	- frame-id 			指定 父坐标系 名字
 	- child-frame-id 	指定 子坐标系 名字
 2. 查询：**`ros2 run tf2_rostf2_echo 父坐标系 子坐标系`**
@@ -1244,12 +1245,208 @@ def generate_launch_description():
 ```c
 ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0.0 --z 0.2 --roll 0.0 --pitch 0.0 --yaw 0.0 --frame-id base_link --child-frame-id base_laser
 ```
-### 2. 3D可视化 旋转 工具：3d-rotation-converter
+#### 1.2 3D可视化 旋转 工具：3d-rotation-converter
 1. 安装：`sudo apt install ros-humble-mrpt2 -y`
 2. 使用：`3d-rotation-convert`
 
-### 3. 可视化 TF 坐标 树结构
+#### 1.3 可视化 TF 坐标 树结构
 1. 命令：**`ros2 run tf2_tools view_frames`**
+
+#### 1.4 查看 两个坐标系 之间的 TF 关系：【重点】
+1. ==语法：**`ros2 run tf2_ros tf2_echo 父坐标系 子坐标系`**==
+
+### 2. TF 原理 简单 探究
+1. ==原理：**话题 通信 机制 `/tf_static`**==
+- 查看 话题：`ros2 topic list`
+2. 查看 /tf_static 详细的 内容：`ros2 topic info /tf_static`
+- 其 消息接口（Type）：`tf2_msgs/msg/TFMessage`
+3. 查看 其 消息接口 的 定义：`ros2 interface show tf2_msgs/msg/TFMessage`
+- `std_msgs/Header header`成员，其内部有：
+  -`builtin_interfaces/Time stamp`  时间辍（坐标发布的时间）
+  - `string frame_id` 父坐标系的id名字
+- `string child_frame_id`成员： 子坐标系的id
+- `Transform transform`成员，内部有：
+  - `Vector3 translation` 子成员数组，其含有：（表示 平移）
+    - float64 x ；float64 y；float64 z
+  - `Quaternion rotation` 子成员 四元素(Quaternion)，其含有：（表示 旋转）
+    - float64 x；float64 y；float64 z；float64 w 
+4. 订阅 TF 话题，查看 当前 消息 内容：**`ros2 topic echo /tf_static`**
+#### 2.2 动态 TF 与 静态 TF 的 区别：
+1. 动态 TF 话题：`/tf`（无 static）
+2. 区别：
+  - 静态 TF 发布：用于 静止 的 物体/组件
+  - ==动态 TF 发布：用于 时刻 运动 的组件（如：车轮 等）。（需要 一直发布TF）==
+
+### 3.【Python】手眼 坐标变换 问题
+#### 背景 与 问题：
+1. 概念：
+- 手：**机械臂**
+- 眼：**照相机**
+2. 背景：
+  生活中，有 相机 与 目标 的 相对坐标（x,y,z与R,P,Y）；有 机械臂 与 相机 的 相对坐标；
+求：==目标 在 机械臂坐标 下的 关系 x,y,z与R,P,Y==
+3. 现实中，困难点：
+  **目标 是 实时动态的**，非静态。使用 静态坐标 发布器 是 不合适的。
+#### 静态 TF 发布：
+1. 原理：**发布`/tf_static`话题**
+2. ==发布工具：`StaticTransformBroadcaster(self)`函数== 
+3. 依赖 安装包：
+`sudo apt install ros-$ROS_DISTRO-tf-transformations`
+4. 创建 工作空间：
+5. 创建 功能包：
+- build_type：ament_python
+- dependencied：rclpy；geometry_msgs 消息接口库；tf_ros；tf_transformation
+6. 创建 python文件：
+1) 导入 库：
+```py
+import rclpy
+from rclpy.node import Node
+# 导入 静态TF坐标 广播器 类
+from tf2_ros import StaticTransformBroadcaster         
+# 导入 消息接口 库 中 的 类
+from geometry_msgs.msg import TransformStamped       
+# 导入 欧拉角 转 四元数 的 函数
+from tf_transformations import quaternion_from_euler    
+# 需要用到 math库 中的 角度转弧度 的 函数
+import math                                            
+```
+2) 创建类：
+```py
+class StaticTFBroadcast(Node):      # 继承 Node类
+    def __init__(self):
+        super().__init__('static_tf_broadcaster')        # 继承 父类 init函数，用来给 节点 其名字
+        # 如何 发布静态坐标变换？   - 使用 静态坐标广播器 对象 -> 创建 该对象
+        self.static_broadcaster_ = StaticTransformBroadcaster(self)         # 内部 需要创建 发布者 发布内容，需要Node=self
+        self.publish_static_tf()
+    '''
+    发布 静态TF：
+    原理：使用 消息接口 发送 坐标
+    发布 的 方法：使用 消息接口对象（TransformStamped）
+    '''
+    def publish_static_tf(self):
+        '''
+        实现：从 base_link 到 camera_link 的 坐标转换
+        '''
+        # 1. 创建 消息接口对象：用于 发送 坐标变换
+        transform = TransformStamped()
+        # 2. 给 该 消息接口的内容 赋值
+        transform.header.frame_id = 'base_link'        # 父类 坐标系 的 id
+        transform.header.stamp = self.get_clock().now().to_msg()    # 获取 时间辍（常用）
+        transform.child_frame_id = 'camera_link'       # 子类 坐标系 的 id
+        # 平移坐标系 设置
+        transform.transform.translation.x = 0.5
+        transform.transform.translation.y = 0.3
+        transform.transform.translation.z = 0.6
+        # 旋转坐标系 设置： 将 角度值 -> 弧度值 -> 四元数
+        # （1） 将 角度值 转化成 弧度值
+        radian_x = math.radians(180)
+        radian_y = math.radians(0)
+        radian_z = math.radians(0)
+        # （2） 将 x,y,z 的 弧度值 转换为 四元数(只接受 弧度值)【其 返回值 为 元组: q = [X,Y,Z,W] 】
+        q = quaternion_from_euler(radian_x,radian_y,radian_z)
+        # （3） 对 旋转坐标系 欧拉角 赋值
+        transform.transform.rotation.x = q[0]
+        transform.transform.rotation.y = q[1]
+        transform.transform.rotation.z = q[2]
+        transform.transform.rotation.w = q[3]
+        # 3. 静态坐标系 发布 出去：
+        self.static_broadcaster_.sendTransform(transform)           # 使用 StaticTransformBroadcaster
+        self.get_logger().info(f'发布静态TF：{transform}')
+```
+#### 【重点】动态 TF 发布
+1. 原理： **不停 发布 /tf 话题**
+2. 背景：动态发布 camera_link 到 目标点 的 坐标
+3. ==发布工具：`TransformBroadcaster(self)`函数==【动态坐标发布器】
+4. ==不断 发布 的 方法：**使用 Timer() 定时器**==
+语法（在 类 构造函数中）：每一段时间，调用一次 调用函数
+`self.timer_ = self.create_timer(一段时间s , 调用函数)`
+5. 文件：
+```py
+import rclpy
+from rclpy.node import Node
+from tf2_ros import TransformBroadcaster          # 动态TF坐标 广播器 类
+from geometry_msgs.msg import TransformStamped          # 消息接口 库 中 的 类
+from tf_transformations import quaternion_from_euler    # 欧拉角 转 四元数 函数
+import math                                             # 需要用到 math库 中的 角度转弧度的 函数
+
+class DynamicTFBroadcast(Node):      # 继承 Node类
+    # pass
+    def __init__(self):
+        super().__init__('Dynamic_tf_broadcaster')        # 继承 父类 init函数，用来给 节点 其名字
+        # 如何 发布动态坐标变换？   - 使用 动态坐标广播器 对象 -> 创建 该对象
+        self.dynamic_broadcaster_ = TransformBroadcaster(self)         # 内部 需要创建 发布者 发布内容，需要Node=self
+        # 创建 定时器 对象,并使用 定时器 定时动态发布TF
+        self.timer_ = self.create_timer(0.01,self.publish_dynamic_tf)
+
+
+    '''
+    注意：由于 需要不停的 调用，所以 需要使用 定时器 来 不停的 调用 该函数
+    '''
+    def publish_dynamic_tf(self):
+        '''
+        实现：从 camera_link 到 bottle_link 的 坐标转换
+        '''
+        # 1. 创建 消息接口对象：用于 发送 坐标变换
+        transform = TransformStamped()
+        # 2. 给 该 消息接口的内容 赋值
+        transform.header.frame_id = 'camera_link'                    
+        transform.header.stamp = self.get_clock().now().to_msg()   
+        transform.child_frame_id = 'bottle_link'                  
+        # 平移坐标系 设置
+        transform.transform.translation.x = 0.2
+        transform.transform.translation.y = 0.3
+        transform.transform.translation.z = 0.5
+        # 旋转坐标系 设置： 将 角度值 -> 弧度值 -> 四元数
+        # （1） 将 角度值 转化成 弧度值
+        radian_x = math.radians(0)
+        radian_y = math.radians(0)
+        radian_z = math.radians(0)
+        # （2） 将 x,y,z 的 弧度值 转换为 四元数(只接受 弧度值)【其 返回值 为 元组: q = [X,Y,Z,W] 】
+        q = quaternion_from_euler(radian_x,radian_y,radian_z)
+        # （3） 对 旋转坐标系 欧拉角 赋值
+        transform.transform.rotation.x = q[0]
+        transform.transform.rotation.y = q[1]
+        transform.transform.rotation.z = q[2]
+        transform.transform.rotation.w = q[3]
+        # 3. 动态坐标系 发布 出去：
+        self.dynamic_broadcaster_.sendTransform(transform)         
+        self.get_logger().info(f'发布动态TF：{transform}')
+
+def main():
+    rclpy.init()
+    node = DynamicTFBroadcast()
+    rclpy.spin(node)
+    rclpy.shutdown()
+```
+6. 查看 动态TF 发布的 **频率**：`ros2 topic hz /tf`
+
+#### 使用 Python 查询 TF之间的 关系
+1. 背景： 查询 base_link 到 bottle_link 之间的 关系
+2. 原理：**订阅话题 /tf /tf_static 收集 所有坐标系 关系，进行计算** 
+3. 方法：
+1) 将 `/tf 与 /tf_static`的 内容，存入到 **`Buffer()`缓冲区 中**
+`self.buffer_ = Buffer()`
+2) 查询 TF关系：创建 `TransformListener(self.buffer_,self)`对象，创建 监听者。
+该 函数 会 **创建 两个 订阅者**。当 需要获取 TF数据 时，去 Buffer() 中 查看即可
+`self.listener_ = TransformListener(self.buffer_,self) `
+3) 使用 定时器 对象，去 不断 计算两者 关系
+`self.timer_ = self.create_timer(1,成员函数)`
+4. 程序：
+(1) 头文件
+```py
+import rclpy
+from rclpy.node import Node
+# 坐标监听器，缓冲区
+from tf2_ros import TransformListener,Buffer         
+# 四元数 转 欧拉角 函数
+from tf_transformations import euler_from_quaternion  
+ # 调用 时间库
+import rclpy.time                      
+```
+(2) 类与main：
+
+
+
 
 # 建模与仿真（实战）篇
 ## 一、建模
@@ -1288,6 +1485,11 @@ ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0.0 --z 0.2 --roll 0.0 -
 解决办法：
 （1）查看环境变量（AMENT_PREFIX_PATH）下的文件有没有该功能包
 （2）若没有，则添加功能包 或者 使用source添加环境变量
+
+### No model named '包名'
+解决办法：
+（1）文件`setup.py`配置错误
+（2） 查看对应的 文件 是否正确
 
 ## 查看 ros2 topic echo /话题名称 时，报错：
 ### 错误：The message type '话题类型' is invalid
@@ -1653,4 +1855,3 @@ def main():
 5. 程序：C++
   - 头文件：`#include<thread>`
   - 与 时间 相关的 头文件：`#include<chrono>`
-

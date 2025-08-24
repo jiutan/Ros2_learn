@@ -43,3 +43,37 @@ void update_server_param_k(double k){
 }
 ```
 ## Python
+### 1. 节点名.py 文件
+```py
+class 节点类名(Node):					# 继承 Node节点类
+	# 构造函数 
+	def __init__(self):
+		# 1. 给 节点 起名字
+		super().__init__('节点名字')	
+		# 2. 创建 需要用到的 类成员 对象
+		self.起个对象名字_ = 用到的类(参数)
+	
+	# 创建 成员函数（在 成员函数中，实现 对应 功能）
+	def 成员函数名(self):
+		'''
+		实现 具体功能
+		'''
+		pass
+
+def main():
+	# 1. ros初始化
+	rclpy.init()
+	# 2. 创建 节点类
+	node = 节点类名()
+	# 3. 运行 节点
+    rclpy.spin(node)
+    # 4. 关闭 节点
+    rclpy.shutdown()
+```
+### 2. setup.py 文件 环境配置
+```py
+	entry_points={
+        'console_scripts': [
+        	'可执行文件名字 = 功能包名.节点文件名:main'
+        ],
+```
